@@ -57,7 +57,6 @@ app.post("/add-product", async (req, res) => {
   }
 });
 
-// Список товаров
 app.get("/get-products", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM products");
@@ -67,7 +66,6 @@ app.get("/get-products", async (req, res) => {
   }
 });
 
-// Генерация штрихкода
 app.get("/barcode/:code", async (req, res) => {
   const { code } = req.params;
 
@@ -107,7 +105,6 @@ app.get("/barcode/:code", async (req, res) => {
   }
 });
 
-// Информация о товаре
 app.get("/product/:barcode", async (req, res) => {
   const { barcode } = req.params;
   try {
@@ -125,7 +122,6 @@ app.get("/product/:barcode", async (req, res) => {
   }
 });
 
-// Создание коробки
 app.post("/create-box", async (req, res) => {
   const { name } = req.body;
   let barcode = generateEAN13("300");
@@ -152,7 +148,6 @@ app.post("/create-box", async (req, res) => {
   }
 });
 
-// Добавление товара в коробку
 app.post("/add-to-box", async (req, res) => {
   const { boxBarcode, productBarcode, quantity } = req.body;
 
@@ -196,7 +191,6 @@ app.post("/add-to-box", async (req, res) => {
   }
 });
 
-// Список коробок
 app.get("/get-boxes", async (req, res) => {
   try {
     const result = await pool.query("SELECT id, barcode, name FROM boxes");
@@ -206,7 +200,6 @@ app.get("/get-boxes", async (req, res) => {
   }
 });
 
-// Содержимое коробки
 app.get("/box-content/:barcode", async (req, res) => {
   const { barcode } = req.params;
 

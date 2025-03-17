@@ -1,4 +1,3 @@
-// Глобальные переменные
 const globalState = {
   stream: null,
   lastDetected: null,
@@ -6,7 +5,6 @@ const globalState = {
   allProducts: [],
 };
 
-// Утилиты
 const utils = {
   fetchData: async (url, options = {}) => {
     const response = await fetch(url, options);
