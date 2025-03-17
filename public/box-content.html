@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Содержимое коробки</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="/js/scripts.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <header class="main-header">
+      <nav>
+        <ul>
+          <li>
+            <a href="/index.html"><i class="fas fa-plus"></i> Добавить товар</a>
+          </li>
+          <li>
+            <a href="/products.html"
+              ><i class="fas fa-list"></i> Список товаров</a
+            >
+          </li>
+          <li>
+            <a href="/scan.html"
+              ><i class="fas fa-camera"></i> Сканировать штрихкод</a
+            >
+          </li>
+          <li>
+            <a href="/boxes.html"
+              ><i class="fas fa-box-open"></i> Управление коробками</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="main-content">
+      <h1 id="boxName">Содержимое коробки</h1>
+      <table>
+        <thead>
+          <tr>
+            <th><i class="fas fa-hashtag"></i> ID</th>
+            <th><i class="fas fa-tag"></i> Название</th>
+            <th><i class="fas fa-box"></i> Количество</th>
+            <th><i class="fas fa-barcode"></i> Штрихкод</th>
+          </tr>
+        </thead>
+        <tbody id="boxContentBody"></tbody>
+      </table>
+      <div id="error" style="display: none"></div>
+    </div>
+    <footer>
+      <p>© 2025 Управление складом</p>
+    </footer>
+  </body>
+</html>
