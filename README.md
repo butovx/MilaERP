@@ -1,26 +1,26 @@
 # MILA ERP
 
-## Описание
+## Description
 
-MILA ERP - это система управления ресурсами предприятия (ERP), разработанная для малого и среднего бизнеса. Она позволяет автоматизировать процессы управления складом, продажами, закупками и финансами.
+MILA ERP is an enterprise resource planning (ERP) system designed for small and medium-sized businesses. It automates warehouse management, sales, procurement, and finance processes.
 
-## Ключевые особенности
+## Key Features
 
-- Управление складом:
-  - Добавление и учет товаров
-  - Управление коробками и упаковками
-  - Сканирование штрихкодов
-- Управление продажами:
-  - Создание и учет заказов
-  - Выставление счетов
-- Управление закупками:
-  - Формирование заявок на закупку
-  - Учет поставок
-- Управление финансами:
-  - Учет доходов и расходов
-  - Формирование отчетов
+- Warehouse Management:
+  - Adding and tracking products
+  - Managing boxes and packages
+  - Scanning barcodes
+- Sales Management:
+  - Creating and tracking orders
+  - Issuing invoices
+- Procurement Management:
+  - Generating purchase requests
+  - Tracking deliveries
+- Financial Management:
+  - Tracking income and expenses
+  - Generating reports
 
-## Технологии
+## Technologies
 
 - Node.js
 - Express
@@ -32,29 +32,29 @@ MILA ERP - это система управления ресурсами пре�
 - JavaScript
 - Font Awesome
 
-## Установка
+## Installation
 
-1.  Установите PostgreSQL и создайте базу данных для проекта.
+1.  Install PostgreSQL and create a database for the project.
 
-2.  Склонируйте репозиторий:
+2.  Clone the repository:
 
     ```bash
     git clone https://github.com/butovx/MilaERP.git
     ```
 
-3.  Перейдите в директорию проекта:
+3.  Navigate to the project directory:
 
     ```bash
     cd MilaERP
     ```
 
-4.  Установите зависимости:
+4.  Install dependencies:
 
     ```bash
     npm install
     ```
 
-5.  Настройте подключение к базе данных. Создайте файл `.env` в корне проекта и укажите следующие переменные:
+5.  Configure the database connection. Create a `.env` file in the project root and specify the following variables:
 
     ```
     DB_USER=your_db_user
@@ -64,55 +64,55 @@ MILA ERP - это система управления ресурсами пре�
     DB_NAME=your_db_name
     ```
 
-    Или настройте подключение непосредственно в `db.js`.
+    Or configure the connection directly in `db.js`.
 
-6.  Запустите сервер:
+6.  Start the server:
 
     ```bash
     npm start
     ```
 
-## Использование
+## Usage
 
-1.  **Добавление товара:** Перейдите на страницу `/index.html`, чтобы добавить новый товар, указав название и количество.
-2.  **Список товаров:** Перейдите на страницу `/products.html`, чтобы просмотреть список всех товаров с их ID, названиями, количеством и штрихкодами.
-3.  **Сканирование штрихкода:** Используйте страницу `/scan.html` для сканирования штрихкода товара с помощью камеры.
-4.  **Управление коробками:** Перейдите на страницу `/boxes.html` для создания новых коробок, добавления товаров в коробки и просмотра содержимого коробок.
+1.  **Add Product:** Go to `/index.html` to add a new product, specifying the name and quantity.
+2.  **Product List:** Go to `/products.html` to view a list of all products with their ID, names, quantity, and barcodes.
+3.  **Barcode Scanning:** Use the `/scan.html` page to scan a product's barcode using the camera.
+4.  **Box Management:** Go to the `/boxes.html` page to create new boxes, add products to boxes, and view box contents.
 
-## Функциональность
+## Functionality
 
-- Добавление товаров с автоматической генерацией уникальных штрихкодов.
-- Просмотр списка товаров с возможностью фильтрации и поиска.
-- Сканирование штрихкодов для быстрого получения информации о товаре.
-- Создание и управление коробками для хранения товаров.
-- Добавление товаров в коробки с указанием количества.
-- Просмотр содержимого коробок.
-- Генерация штрихкодов в формате EAN13.
+- Adding products with automatic generation of unique barcodes.
+- Viewing a list of products with filtering and search capabilities.
+- Scanning barcodes for quick product information retrieval.
+- Creating and managing boxes for product storage.
+- Adding products to boxes with quantity specification.
+- Viewing box contents.
+- Generating barcodes in EAN13 format.
 
-## Структура проекта
+## Project Structure
 
-- `public/`: Статические файлы (HTML, CSS, JavaScript).
-  - `index.html`: Форма для добавления товара.
-  - `products.html`: Список товаров.
-  - `scan.html`: Страница сканирования штрихкода.
-  - `boxes.html`: Страница управления коробками.
-  - `box-content.html`: Страница просмотра содержимого коробки.
-  - `css/`: Стили CSS.
-  - `js/`: Скрипты JavaScript.
-- `server.js`: Основной файл сервера на Node.js с использованием Express.
-- `db.js`: Файл для подключения к базе данных PostgreSQL.
-- `package.json`: Файл с информацией о проекте и зависимостями.
+- `public/`: Static files (HTML, CSS, JavaScript).
+  - `index.html`: Form for adding a product.
+  - `products.html`: Product list.
+  - `scan.html`: Barcode scanning page.
+  - `boxes.html`: Box management page.
+  - `box-content.html`: Page for viewing box contents.
+  - `css/`: CSS styles.
+  - `js/`: JavaScript scripts.
+- `server.js`: Main server file on Node.js using Express.
+- `db.js`: File for connecting to the PostgreSQL database.
+- `package.json`: File with project information and dependencies.
 
-## Зависимости
+## Dependencies
 
-- `body-parser`: Middleware для обработки тела запросов.
-- `canvas`: Node.js canvas API для генерации изображений штрихкодов.
-- `dotenv`: Загрузка переменных окружения из файла `.env`.
-- `ean13-lib`: Библиотека для генерации штрихкодов EAN13.
-- `express`: Фреймворк для создания веб-приложений на Node.js.
-- `jsbarcode`: Библиотека для генерации штрихкодов на canvas.
-- `pg`: Клиент PostgreSQL для Node.js.
+- `body-parser`: Middleware for handling request bodies.
+- `canvas`: Node.js canvas API for generating barcode images.
+- `dotenv`: Loading environment variables from the `.env` file.
+- `ean13-lib`: Library for generating EAN13 barcodes.
+- `express`: Framework for creating web applications on Node.js.
+- `jsbarcode`: Library for generating barcodes on canvas.
+- `pg`: PostgreSQL client for Node.js.
 
-## Лицензия
+## License
 
 ISC
