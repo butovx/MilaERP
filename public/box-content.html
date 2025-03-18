@@ -40,7 +40,7 @@
       </nav>
     </header>
     <div class="main-content">
-      <h1 id="boxName">Содержимое коробки</h1>
+      <h1 id="boxName"></h1>
       <table>
         <thead>
           <tr>
@@ -48,11 +48,26 @@
             <th><i class="fas fa-tag"></i> Название</th>
             <th><i class="fas fa-box"></i> Количество</th>
             <th><i class="fas fa-barcode"></i> Штрихкод</th>
+            <th><i class="fas fa-trash"></i> Действия</th>
           </tr>
         </thead>
         <tbody id="boxContentBody"></tbody>
       </table>
-      <div id="error" style="display: none"></div>
+      <div id="error"></div>
+    
+      <!-- Модальное окно для редактирования -->
+      <div id="editBoxItemModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <span class="close">×</span>
+          <h2>Редактировать количество в коробке</h2>
+          <form id="editBoxItemForm">
+            <label for="editBoxItemQuantity">Количество:</label><br />
+            <input type="number" id="editBoxItemQuantity" name="quantity" required /><br />
+            <button type="submit"><i class="fas fa-save"></i> Сохранить</button>
+          </form>
+          <div id="editBoxItemResult" style="display: none;"></div>
+        </div>
+      </div>
     </div>
     <footer>
       <p>© 2025 Управление складом</p>
