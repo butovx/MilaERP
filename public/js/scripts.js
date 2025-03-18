@@ -581,91 +581,232 @@ const scanModule = {
 
 const boxesModule = {
   init: () => {
+    const boxesListBody = document.querySelector("#boxesList tbody");
+    const boxErrorDiv = document.getElementById("boxError");
     const createBoxForm = document.getElementById("createBoxForm");
-    const resultDiv = document.getElementById("result");
+    const createResult = document.getElementById("createResult");
+    const boxContentContainer = document.getElementById("boxContentContainer");
+    const boxContentBody = document.querySelector("#boxContentList tbody");
+    const boxContentError = document.getElementById("boxContentError");
+    const boxContentName = document.getElementById("boxContentName");
     const addToBoxForm = document.getElementById("addToBoxForm");
-    const addResultDiv = document.getElementById("addResult");
-    const boxesList = document.getElementById("boxesList");
-    const listErrorDiv = document.getElementById("listError");
-    const boxBarcodeSelect = document.getElementById("boxBarcode");
-    const productBarcodeSelect = document.getElementById("productBarcode");
+    const addToBoxContainer = document.getElementById("addToBoxContainer");
+    const addResult = document.getElementById("addResult");
 
-    if (
-      !createBoxForm ||
-      !resultDiv ||
-      !addToBoxForm ||
-      !addResultDiv ||
-      !boxesList ||
-      !listErrorDiv ||
-      !boxBarcodeSelect ||
-      !productBarcodeSelect
-    )
-      return;
+    if (!boxesListBody || !boxErrorDiv || !createBoxForm || !createResult || 
+        !boxContentContainer || !boxContentBody || !boxContentError || !boxContentName || 
+        !addToBoxForm || !addToBoxContainer || !addResult) return;
 
-    async function loadSelectData() {
+    let currentBoxBarcode = null;
+
+    // Загрузка списка коробок
+    boxesModule.loadBoxes = async function () {
       try {
         const boxes = await utils.fetchData("/get-boxes");
-        const products = await utils.fetchData("/get-products");
-        utils.populateSelect(boxBarcodeSelect, boxes, "barcode", "name");
-        utils.populateSelect(productBarcodeSelect, products, "barcode", "name");
+        boxesListBody.innerHTML = "";
+        if (!boxes || boxes.length === 0) {
+          utils.showMessage(boxErrorDiv, "Коробки не найдены", "error");
+          return;
+        }
+        boxes.forEach((box) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${box.barcode}</td>
+            <td>${box.name}</td>
+            <td>
+              <button class="view-content-btn" data-barcode="${box.barcode}">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="delete-btn" data-barcode="${box.barcode}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          `;
+          boxesListBody.appendChild(row);
+        });
       } catch (error) {
-        utils.showMessage(listErrorDiv, error.message, "error");
+        utils.showMessage(boxErrorDiv, error.message, "error");
       }
-    }
+    };
 
+    boxesModule.loadBoxes();
+
+    // Создание коробки
     createBoxForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("boxName").value;
-      resultDiv.style.display = "none";
-      resultDiv.classList.remove("success", "error");
       try {
         const message = await utils.fetchData("/create-box", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name }),
         });
-        utils.showMessage(resultDiv, message, "success");
+        utils.showMessage(createResult, message, "success");
+        createBoxForm.reset();
         boxesModule.loadBoxes();
-        loadSelectData();
       } catch (error) {
-        utils.showMessage(resultDiv, error.message, "error");
+        utils.showMessage(createResult, error.message, "error");
       }
     });
 
+    // Обработка кликов по кнопкам
+    boxesListBody.addEventListener("click", async (e) => {
+      const viewBtn = e.target.closest(".view-content-btn");
+      const deleteBtn = e.target.closest(".delete-btn");
+
+      if (viewBtn) {
+        e.stopPropagation();
+        currentBoxBarcode = viewBtn.getAttribute("data-barcode");
+        try {
+          const content = await utils.fetchData(`/box-content/${currentBoxBarcode}`);
+          boxContentName.textContent = content.name;
+          boxContentBody.innerHTML = "";
+          if (!content.items || content.items.length === 0) {
+            utils.showMessage(boxContentError, "Товары в коробке не найдены", "error");
+          } else {
+            content.items.forEach((item) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${item.id}</td>
+                <td>${
+                  item.photo_paths && item.photo_paths.length > 0
+                    ? `<img src="${item.photo_paths[0]}" alt="${item.name}" style="max-width: 50px; max-height: 50px;">`
+                    : "-"
+                }</td>
+                <td><a href="/product.html?barcode=${item.barcode}">${item.name}</a></td>
+                <td>${item.barcode}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price ? item.price + " ₽" : "-"}</td>
+                <td>${item.category || "-"}</td>
+                <td>
+                  <button class="delete-from-box-btn" data-product-barcode="${item.barcode}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              `;
+              boxContentBody.appendChild(row);
+            });
+            utils.showMessage(boxContentError, "", ""); // Очистка ошибок
+          }
+          boxContentContainer.style.display = "block";
+          addToBoxContainer.style.display = "block";
+        } catch (error) {
+          utils.showMessage(boxContentError, error.message, "error");
+        }
+      }
+
+      if (deleteBtn) {
+        e.stopPropagation();
+        const barcode = deleteBtn.getAttribute("data-barcode");
+        if (confirm(`Удалить коробку с штрихкодом ${barcode}?`)) {
+          try {
+            const message = await utils.fetchData(`/delete-box/${barcode}?force=true`, {
+              method: "DELETE",
+            });
+            utils.showMessage(boxErrorDiv, message, "success");
+            boxesModule.loadBoxes();
+            boxContentContainer.style.display = "none";
+            addToBoxContainer.style.display = "none";
+          } catch (error) {
+            utils.showMessage(boxErrorDiv, error.message, "error");
+          }
+        }
+      }
+    });
+
+    // Удаление товара из коробки
+    boxContentBody.addEventListener("click", async (e) => {
+      if (e.target.closest(".delete-from-box-btn")) {
+        e.stopPropagation();
+        const button = e.target.closest(".delete-from-box-btn");
+        const productBarcode = button.getAttribute("data-product-barcode");
+        if (confirm(`Удалить товар ${productBarcode} из коробки ${currentBoxBarcode}?`)) {
+          try {
+            const message = await utils.fetchData(
+              `/delete-from-box/${currentBoxBarcode}/${productBarcode}`,
+              { method: "DELETE" }
+            );
+            utils.showMessage(boxContentError, message, "success");
+            const content = await utils.fetchData(`/box-content/${currentBoxBarcode}`);
+            boxContentBody.innerHTML = "";
+            content.items.forEach((item) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${item.id}</td>
+                <td>${
+                  item.photo_paths && item.photo_paths.length > 0
+                    ? `<img src="${item.photo_paths[0]}" alt="${item.name}" style="max-width: 50px; max-height: 50px;">`
+                    : "-"
+                }</td>
+                <td><a href="/product.html?barcode=${item.barcode}">${item.name}</a></td>
+                <td>${item.barcode}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price ? item.price + " ₽" : "-"}</td>
+                <td>${item.category || "-"}</td>
+                <td>
+                  <button class="delete-from-box-btn" data-product-barcode="${item.barcode}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              `;
+              boxContentBody.appendChild(row);
+            });
+          } catch (error) {
+            utils.showMessage(boxContentError, error.message, "error");
+          }
+        }
+      }
+    });
+
+    // Добавление товара в коробку
     addToBoxForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const boxBarcode = boxBarcodeSelect.value;
-      const productBarcode = productBarcodeSelect.value;
-      const quantity = parseInt(document.getElementById("quantity").value);
-      addResultDiv.style.display = "none";
-      addResultDiv.classList.remove("success", "error");
-      if (!boxBarcode || !productBarcode) {
-        utils.showMessage(addResultDiv, "Выберите коробку и товар", "error");
+      if (!currentBoxBarcode) {
+        utils.showMessage(addResult, "Выберите коробку", "error");
+        return;
+      }
+      const productBarcode = document.getElementById("productBarcode").value;
+      const quantity = parseInt(document.getElementById("productQuantity").value);
+      if (isNaN(quantity) || quantity <= 0) {
+        utils.showMessage(addResult, "Введите корректное количество", "error");
         return;
       }
       try {
         const message = await utils.fetchData("/add-to-box", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ boxBarcode, productBarcode, quantity }),
+          body: JSON.stringify({ boxBarcode: currentBoxBarcode, productBarcode, quantity }),
         });
-        utils.showMessage(addResultDiv, message, "success");
+        utils.showMessage(addResult, message, "success");
+        addToBoxForm.reset();
+        const content = await utils.fetchData(`/box-content/${currentBoxBarcode}`);
+        boxContentBody.innerHTML = "";
+        content.items.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.id}</td>
+            <td>${
+              item.photo_paths && item.photo_paths.length > 0
+                ? `<img src="${item.photo_paths[0]}" alt="${item.name}" style="max-width: 50px; max-height: 50px;">`
+                : "-"
+            }</td>
+            <td><a href="/product.html?barcode=${item.barcode}">${item.name}</a></td>
+            <td>${item.barcode}</td>
+            <td>${item.quantity}</td>
+            <td>${item.price ? item.price + " ₽" : "-"}</td>
+            <td>${item.category || "-"}</td>
+            <td>
+              <button class="delete-from-box-btn" data-product-barcode="${item.barcode}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          `;
+          boxContentBody.appendChild(row);
+        });
       } catch (error) {
-        utils.showMessage(addResultDiv, error.message, "error");
+        utils.showMessage(addResult, error.message, "error");
       }
     });
-
-    boxesModule.loadBoxes = async function () {
-      try {
-        const boxes = await utils.fetchData("/get-boxes");
-        utils.populateBoxesTable(boxesList, boxes, listErrorDiv);
-      } catch (error) {
-        utils.showMessage(listErrorDiv, error.message, "error");
-      }
-    };
-
-    boxesModule.loadBoxes();
-    loadSelectData();
   },
   loadBoxes: null,
 };

@@ -503,12 +503,20 @@ app.get("/box-content/:barcode", async (req, res) => {
     const boxName = boxResult.rows[0].name;
 
     const contentResult = await pool.query(
-      "SELECT p.id, p.name, p.barcode, bi.quantity FROM box_items bi JOIN products p ON bi.product_id = p.id WHERE bi.box_id = $1",
+      "SELECT p.id, p.name, p.barcode, p.photo_paths, p.price, p.category, bi.quantity " +
+      "FROM box_items bi JOIN products p ON bi.product_id = p.id WHERE bi.box_id = $1",
       [boxId]
     );
 
-    res.status(200).json({ name: boxName, items: contentResult.rows });
+    // Парсим photo_paths из JSON
+    const items = contentResult.rows.map(row => ({
+      ...row,
+      photo_paths: JSON.parse(row.photo_paths || "[]")
+    }));
+
+    res.status(200).json({ name: boxName, items });
   } catch (error) {
+    console.error("Ошибка при получении содержимого коробки:", error);
     res.status(500).json({ error: "Ошибка при получении содержимого коробки" });
   }
 });

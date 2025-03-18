@@ -825,3 +825,24 @@ td:last-child {
   text-decoration: none;
   cursor: pointer;
 }
+
+#boxContentList img {
+  max-width: 50px;
+  max-height: 50px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+#boxContentList td, #boxContentList th {
+  vertical-align: middle;
+  text-align: center;
+  padding: 8px;
+}
+
+#boxContentContainer {
+  margin-top: 20px;
+}
+
+#addToBoxContainer {
+  margin-top: 20px;
+}
