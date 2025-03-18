@@ -45,7 +45,7 @@ MILA ERP is an enterprise resource planning (ERP) system designed for small and 
 3.  Navigate to the project directory:
 
     ```bash
-    cd MilaERP
+    cd mila_erp
     ```
 
 4.  Install dependencies:
