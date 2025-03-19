@@ -6,38 +6,66 @@ const globalState = {
 };
 
 const utils = {
+  // Fetch data from the server with support for progress tracking
   fetchData: async (url, options = {}, onProgress) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open(options.method || "GET", url, true);
       xhr.onload = () => {
-        const data = JSON.parse(xhr.responseText);
+        let data;
+        try {
+          data = JSON.parse(xhr.responseText); // Parse server response as JSON
+        } catch (e) {
+          reject(new Error("Invalid JSON response from server"));
+          return;
+        }
         if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(data.message || data);
+          resolve(data.message || data); // Return message or full data
         } else {
           reject(new Error(data.error || "Ошибка запроса"));
         }
       };
       xhr.onerror = () => reject(new Error("Ошибка сети"));
       if (onProgress && xhr.upload) {
-        xhr.upload.onprogress = onProgress;
+        xhr.upload.onprogress = onProgress; // Track upload progress (e.g., for file uploads)
       }
       if (options.body instanceof FormData) {
+        // Handle FormData (e.g., file uploads)
         xhr.send(options.body);
-      } else {
+      } else if (options.body) {
+        // Handle JSON requests
+        let body = options.body;
+        // Fix for potential double-stringified input
+        if (typeof body === "string") {
+          try {
+            body = JSON.parse(body); // Parse if accidentally stringified already
+          } catch (e) {
+            console.error("Invalid JSON string in body:", body);
+            reject(new Error("Invalid JSON in request body"));
+            return;
+          }
+        }
         xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(JSON.stringify(options.body));
+        xhr.send(JSON.stringify(body));
+      } else {
+        // No body (e.g., GET requests)
+        xhr.send();
       }
     });
   },
+
+  // Populate a product table with edit/delete buttons
   populateTable: (tbody, products, errorDiv) => {
-    tbody.innerHTML = "";
+    tbody.innerHTML = ""; // Clear existing rows
     if (!products || products.length === 0) {
       utils.showMessage(errorDiv, "Товары не найдены", "error");
       return;
     }
     products.forEach((product) => {
       const row = document.createElement("tr");
+      const boxInfo = product.boxes.length > 0
+        ? product.boxes.map(box => `<a href="/box-content.html?barcode=${box.barcode}">${box.name}</a>`).join(", ")
+        : "Не в коробке";
       row.innerHTML = `
         <td>${product.id}</td>
         <td>${
@@ -50,6 +78,7 @@ const utils = {
         <td>${product.price ? product.price + " ₽" : "-"}</td>
         <td>${product.category || "-"}</td>
         <td>${product.barcode}</td>
+        <td>${boxInfo}</td>
         <td>
           <button class="edit-btn" data-barcode="${product.barcode}">
             <i class="fas fa-edit"></i>
@@ -62,6 +91,7 @@ const utils = {
       tbody.appendChild(row);
     });
 
+    // Attach delete button event listeners
     tbody.querySelectorAll(".delete-btn").forEach((button) => {
       button.addEventListener("click", async (e) => {
         e.stopPropagation();
@@ -99,6 +129,8 @@ const utils = {
       });
     });
   },
+
+  // Populate a boxes table with view/edit/delete buttons
   populateBoxesTable: (tbody, data, errorDiv) => {
     tbody.innerHTML = "";
     if (data.length === 0) {
@@ -134,6 +166,7 @@ const utils = {
       tbody.appendChild(row);
     });
 
+    // Delete button event listeners
     tbody.querySelectorAll(".delete-btn").forEach((button) => {
       button.addEventListener("click", async () => {
         const barcode = button.getAttribute("data-barcode");
@@ -170,6 +203,7 @@ const utils = {
       });
     });
 
+    // Edit button handling (modal setup)
     const modal = document.getElementById("editBoxModal");
     const closeBtn = modal?.querySelector(".close");
     const editForm = document.getElementById("editBoxForm");
@@ -219,6 +253,8 @@ const utils = {
       if (event.target === modal) modal.style.display = "none";
     };
   },
+
+  // Populate a <select> element with options
   populateSelect: (select, data, valueKey, displayKey) => {
     select.innerHTML = '<option value="">Выберите</option>';
     data.forEach((item) => {
@@ -228,11 +264,15 @@ const utils = {
       select.appendChild(option);
     });
   },
+
+  // Show a styled message in an element
   showMessage: (element, message, type) => {
     element.style.display = "block";
-    element.className = type;
+    element.className = type; // e.g., "success" or "error"
     element.textContent = message;
   },
+
+  // Download a file as PNG
   downloadPNG: (url, filename) => {
     const link = document.createElement("a");
     link.href = url;
@@ -331,7 +371,7 @@ const productsModule = {
     const listErrorDiv = document.getElementById("listError");
     if (!productsListBody || !listErrorDiv) return;
 
-    let currentBarcode = null; // Храним текущий barcode
+    let currentBarcode = null;
 
     productsModule.loadProducts = async function () {
       try {
@@ -395,7 +435,7 @@ const productsModule = {
           } else {
             currentPhoto.style.display = "none";
           }
-          photoInput.value = ""; // Сбрасываем выбранные файлы
+          photoInput.value = "";
           modal.style.display = "block";
         } catch (error) {
           utils.showMessage(listErrorDiv, error.message, "error");
@@ -417,7 +457,6 @@ const productsModule = {
       const category = document.getElementById("editCategory").value;
       const photos = photoInput.files;
 
-      // Валидация данных
       if (!name) {
         utils.showMessage(editResult, "Название обязательно", "error");
         return;
@@ -433,10 +472,10 @@ const productsModule = {
 
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("quantity", parseInt(quantity)); // Преобразуем в число
-      formData.append("description", description || ""); // Пустая строка, если нет
-      formData.append("price", price === "" ? "" : parseFloat(price)); // Пустая строка или число
-      formData.append("category", category || ""); // Пустая строка, если нет
+      formData.append("quantity", parseInt(quantity));
+      formData.append("description", description || "");
+      formData.append("price", price === "" ? "" : parseFloat(price));
+      formData.append("category", category || "");
       for (let i = 0; i < photos.length; i++) {
         formData.append("photos", photos[i]);
       }
@@ -631,10 +670,11 @@ const boxesModule = {
 
     boxesModule.loadBoxes();
 
-    // Создание коробки
     createBoxForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("boxName").value;
+      createResult.style.display = "none";
+      createResult.classList.remove("success", "error");
       try {
         const message = await utils.fetchData("/create-box", {
           method: "POST",
@@ -642,8 +682,8 @@ const boxesModule = {
           body: JSON.stringify({ name }),
         });
         utils.showMessage(createResult, message, "success");
-        createBoxForm.reset();
         boxesModule.loadBoxes();
+        createBoxForm.reset(); // Очистка формы после успеха
       } catch (error) {
         utils.showMessage(createResult, error.message, "error");
       }
@@ -828,18 +868,29 @@ const boxContentModule = {
         
         boxContentBody.innerHTML = "";
         if (data.items.length === 0) {
-          errorDiv.style.display = "block";
-          errorDiv.textContent = "Товары в коробке не найдены";
+          utils.showMessage(errorDiv, "Товары в коробке не найдены", "error");
           return;
         }
         errorDiv.style.display = "none";
         data.items.forEach((item) => {
           const row = document.createElement("tr");
+          // Формируем информацию о коробках
+          const boxInfo = item.boxes.length > 0
+            ? item.boxes.map(box => `<a href="/box-content.html?barcode=${box.barcode}">${box.name}</a>`).join(", ")
+            : "Не в коробке";
           row.innerHTML = `
             <td>${item.id}</td>
-            <td>${item.name}</td>
+            <td>${
+              item.photo_paths && item.photo_paths.length > 0
+                ? `<img src="${item.photo_paths[0]}" alt="${item.name}" style="max-width: 50px; max-height: 50px;">`
+                : "-"
+            }</td>
+            <td><a href="/product.html?barcode=${item.barcode}">${item.name}</a></td>
             <td>${item.quantity}</td>
+            <td>${item.price ? item.price + " ₽" : "-"}</td>
+            <td>${item.category || "-"}</td>
             <td>${item.barcode}</td>
+            <td>${boxInfo}</td>
             <td>
               <button class="edit-btn" data-box-barcode="${barcode}" data-product-barcode="${item.barcode}">
                 <i class="fas fa-edit"></i>
@@ -893,6 +944,10 @@ const boxContentModule = {
               editForm.onsubmit = async (e) => {
                 e.preventDefault();
                 const quantity = parseInt(document.getElementById("editBoxItemQuantity").value);
+                if (isNaN(quantity) || quantity < 0) {
+                  utils.showMessage(editResult, "Введите корректное количество", "error");
+                  return;
+                }
                 try {
                   const message = await utils.fetchData(
                     `/update-box-item/${boxBarcode}/${productBarcode}`,
@@ -939,6 +994,7 @@ const productModule = {
     const productPrice = document.getElementById("productPrice");
     const productCategory = document.getElementById("productCategory");
     const productDescription = document.getElementById("productDescription");
+    const productBoxes = document.getElementById("productBoxes");
     const downloadBarcode = document.getElementById("downloadBarcode");
     const errorDiv = document.getElementById("error");
     const prevButton = document.getElementById("prevPhoto");
@@ -953,6 +1009,7 @@ const productModule = {
       !productPrice ||
       !productCategory ||
       !productDescription ||
+      !productBoxes ||
       !downloadBarcode ||
       !errorDiv ||
       !prevButton ||
@@ -980,6 +1037,11 @@ const productModule = {
         productCategory.textContent = product.category || "Не указано";
         productDescription.textContent = product.description || "Нет описания";
         downloadBarcode.href = `/barcode/${product.barcode}`;
+
+        // Отображаем список коробок
+        productBoxes.innerHTML = product.boxes.length > 0
+          ? product.boxes.map(box => `<a href="/box-content.html?barcode=${box.barcode}">${box.name}</a>`).join(", ")
+          : "Не в коробке";
 
         photoPaths = product.photo_paths.length > 0 ? product.photo_paths : ["/images/placeholder.png"];
         updatePhoto();

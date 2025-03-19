@@ -1,10 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const multer = require("multer");
+
 const path = require("path");
 const { createCanvas } = require("canvas");
 const JsBarcode = require("jsbarcode");
 const fs = require("fs");
-const multer = require("multer");
+
 const pool = require("./db");
 const app = express();
 const port = 3000;
@@ -27,9 +29,8 @@ const storage = multer.diskStorage({
     cb(null, `${uniqueSuffix}-${file.originalname}`);
   },
 });
-const upload = multer({ storage }).array("photos", 10); // До 10 файлов с ключом 'photos'
+const upload = multer({ storage }).array("photos", 10); 
 
-// Генерация штрихкода EAN-13
 function generateEAN13(prefix) {
   const random = Math.floor(Math.random() * 1000000000)
     .toString()
@@ -49,7 +50,6 @@ function calculateEAN13CheckDigit(code) {
   return mod === 0 ? 0 : 10 - mod;
 }
 
-// Добавление товара
 app.post("/add-product", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -83,14 +83,29 @@ app.post("/add-product", (req, res) => {
   });
 });
 
-// Получение списка товаров
 app.get("/get-products", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM products");
-    const products = result.rows.map((row) => ({
-      ...row,
-      photo_paths: JSON.parse(row.photo_paths || "[]"),
-    }));
+    const products = await Promise.all(
+      result.rows.map(async (row) => {
+        const photo_paths = JSON.parse(row.photo_paths || "[]");
+        const boxesResult = await pool.query(
+          "SELECT b.barcode, b.name " +
+          "FROM box_items bi JOIN boxes b ON bi.box_id = b.id " +
+          "WHERE bi.product_id = $1",
+          [row.id]
+        );
+        const boxes = boxesResult.rows.map((box) => ({
+          barcode: box.barcode,
+          name: box.name,
+        }));
+        return {
+          ...row,
+          photo_paths,
+          boxes,
+        };
+      })
+    );
     res.status(200).json(products);
   } catch (error) {
     console.error("Ошибка при получении списка товаров:", error);
@@ -98,7 +113,6 @@ app.get("/get-products", async (req, res) => {
   }
 });
 
-// Получение товара по штрихкоду
 app.get("/product/:barcode", async (req, res) => {
   const { barcode } = req.params;
   try {
@@ -111,6 +125,18 @@ app.get("/product/:barcode", async (req, res) => {
     }
     const product = result.rows[0];
     product.photo_paths = JSON.parse(product.photo_paths || "[]");
+
+    const boxesResult = await pool.query(
+      "SELECT b.barcode, b.name " +
+      "FROM box_items bi JOIN boxes b ON bi.box_id = b.id " +
+      "WHERE bi.product_id = $1",
+      [product.id]
+    );
+    product.boxes = boxesResult.rows.map((box) => ({
+      barcode: box.barcode,
+      name: box.name,
+    }));
+
     res.status(200).json(product);
   } catch (error) {
     console.error("Ошибка при получении товара:", error);
@@ -118,7 +144,6 @@ app.get("/product/:barcode", async (req, res) => {
   }
 });
 
-// Обновление товара
 app.put("/update-product/:barcode", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -166,7 +191,6 @@ app.put("/update-product/:barcode", (req, res) => {
   });
 });
 
-// Удаление товара
 app.delete("/delete-product/:barcode", async (req, res) => {
   const { barcode } = req.params;
 
@@ -181,10 +205,9 @@ app.delete("/delete-product/:barcode", async (req, res) => {
 
     const photoPaths = JSON.parse(result.rows[0].photo_paths || "[]");
 
-    // Удаляем товар из базы данных
     await pool.query("DELETE FROM products WHERE barcode = $1", [barcode]);
 
-    // Удаляем все связанные файлы изображений
+    
     photoPaths.forEach((photoPath) => {
       const fullPath = path.join(__dirname, "public", photoPath);
       if (fs.existsSync(fullPath)) {
@@ -199,7 +222,6 @@ app.delete("/delete-product/:barcode", async (req, res) => {
   }
 });
 
-// Обновление коробки
 app.put("/update-box/:barcode", async (req, res) => {
   const { barcode } = req.params;
   const { name, newBarcode } = req.body;
@@ -236,7 +258,6 @@ app.put("/update-box/:barcode", async (req, res) => {
   }
 });
 
-// Удаление коробки
 app.delete("/delete-box/:barcode", async (req, res) => {
   const { barcode } = req.params;
   const force = req.query.force === "true";
@@ -276,7 +297,6 @@ app.delete("/delete-box/:barcode", async (req, res) => {
   }
 });
 
-// Удаление товара из коробки
 app.delete("/delete-from-box/:boxBarcode/:productBarcode", async (req, res) => {
   const { boxBarcode, productBarcode } = req.params;
 
@@ -413,15 +433,17 @@ app.post("/create-box", async (req, res) => {
   let barcode = generateEAN13("300");
   let isUnique = false;
 
-  while (!isUnique) {
-    const result = await pool.query("SELECT * FROM boxes WHERE barcode = $1", [
-      barcode,
-    ]);
-    if (result.rows.length === 0) isUnique = true;
-    else barcode = generateEAN13("300");
-  }
-
   try {
+    // Проверка уникальности штрихкода
+    while (!isUnique) {
+      const result = await pool.query("SELECT * FROM boxes WHERE barcode = $1", [
+        barcode,
+      ]);
+      if (result.rows.length === 0) isUnique = true;
+      else barcode = generateEAN13("300");
+    }
+
+    // Вставка новой коробки
     await pool.query("INSERT INTO boxes (barcode, name) VALUES ($1, $2)", [
       barcode,
       name || `Коробка ${barcode}`,
@@ -430,7 +452,8 @@ app.post("/create-box", async (req, res) => {
       .status(201)
       .json({ message: `Коробка создана с штрихкодом: ${barcode}` });
   } catch (error) {
-    res.status(500).json({ error: "Ошибка при создании коробки" });
+    console.error("Ошибка при создании коробки:", error.message);
+    res.status(500).json({ error: `Ошибка при создании коробки: ${error.message}` });
   }
 });
 
@@ -478,7 +501,6 @@ app.post("/add-to-box", async (req, res) => {
   }
 });
 
-// Получение списка коробок
 app.get("/get-boxes", async (req, res) => {
   try {
     const result = await pool.query("SELECT id, barcode, name FROM boxes");
@@ -488,7 +510,6 @@ app.get("/get-boxes", async (req, res) => {
   }
 });
 
-// Получение содержимого коробки
 app.get("/box-content/:barcode", async (req, res) => {
   const { barcode } = req.params;
 
@@ -508,11 +529,26 @@ app.get("/box-content/:barcode", async (req, res) => {
       [boxId]
     );
 
-    // Парсим photo_paths из JSON
-    const items = contentResult.rows.map(row => ({
-      ...row,
-      photo_paths: JSON.parse(row.photo_paths || "[]")
-    }));
+    const items = await Promise.all(
+      contentResult.rows.map(async (row) => {
+        const photoPaths = JSON.parse(row.photo_paths || "[]");
+        const boxesResult = await pool.query(
+          "SELECT b.barcode, b.name " +
+          "FROM box_items bi JOIN boxes b ON bi.box_id = b.id " +
+          "WHERE bi.product_id = $1",
+          [row.id]
+        );
+        const boxes = boxesResult.rows.map((box) => ({
+          barcode: box.barcode,
+          name: box.name,
+        }));
+        return {
+          ...row,
+          photo_paths: photoPaths,
+          boxes,
+        };
+      })
+    );
 
     res.status(200).json({ name: boxName, items });
   } catch (error) {
@@ -521,7 +557,6 @@ app.get("/box-content/:barcode", async (req, res) => {
   }
 });
 
-// Запуск сервера
 app.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);
 });

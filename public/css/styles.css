@@ -212,6 +212,7 @@ button:active {
   background: linear-gradient(90deg, #c0392b, #e74c3c);
 }
 
+/* Обновление стилей для таблицы в box-content.html */
 table {
   width: 100%;
   max-width: 1500px;
@@ -223,10 +224,9 @@ table {
   overflow: hidden;
 }
 
-th,
-td {
+th, td {
   padding: 12px;
-  text-align: left;
+  text-align: center; /* Центрируем все столбцы */
   border-bottom: 1px solid #ecf0f1;
 }
 
@@ -237,13 +237,27 @@ th {
   font-size: 0.9rem;
 }
 
-th i {
-  margin-right: 5px;
+td img {
+  max-width: 50px;
+  max-height: 50px;
+  object-fit: cover;
+  border-radius: 3px;
 }
 
-td {
-  font-size: 0.95rem;
-  color: #333;
+td a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+td a:hover {
+  text-decoration: underline;
+}
+
+/* Стили для столбца "Действия" */
+td:last-child {
+  display: flex;
+  gap: 5px;
+  justify-content: center; /* Центрируем кнопки действий */
 }
 
 #productsList .download-btn {
@@ -845,4 +859,42 @@ td:last-child {
 
 #addToBoxContainer {
   margin-top: 20px;
+}
+
+/* Стили для списка товаров (products.html) */
+#productsList td, #productsList th {
+  vertical-align: middle;
+  text-align: center;
+  padding: 8px;
+}
+
+#productsList img {
+  max-width: 50px;
+  max-height: 50px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+#productsList td a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+#productsList td a:hover {
+  text-decoration: underline;
+}
+
+/* Стили для карточки товара (product.html) */
+.product-info p {
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.product-info p a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.product-info p a:hover {
+  text-decoration: underline;
 }
