@@ -142,30 +142,35 @@ const utils = {
     data.forEach((box) => {
       const row = document.createElement("tr");
       row.innerHTML = `
+        <td><a href="#" class="clickable-barcode" data-barcode="${box.barcode}">${box.barcode}</a></td>
         <td>${box.name}</td>
         <td>
-          ${box.barcode}
-          <a href="/barcode/${box.barcode}" download="barcode_${box.barcode}.png" class="download-btn">
-            <i class="fas fa-download"></i>
-          </a>
-        </td>
-        <td>
-          <a href="/box-content.html?barcode=${box.barcode}">
+          <a href="/box-content.html?barcode=${box.barcode}" class="view-btn">
             <i class="fas fa-eye"></i> Просмотр
           </a>
-        </td>
-        <td>
           <button class="edit-btn" data-barcode="${box.barcode}">
             <i class="fas fa-edit"></i>
           </button>
           <button class="delete-btn" data-barcode="${box.barcode}">
             <i class="fas fa-trash"></i>
           </button>
+          <a href="/barcode/${box.barcode}" download="barcode_${box.barcode}.png" class="download-btn">
+            <i class="fas fa-download"></i>
+          </a>
         </td>
       `;
       tbody.appendChild(row);
     });
-
+  
+    // Добавляем обработчик для кликабельных штрихкодов
+    tbody.querySelectorAll(".clickable-barcode").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const barcode = link.getAttribute("data-barcode");
+        utils.downloadPNG(`/barcode/${barcode}`, `barcode_${barcode}.png`);
+      });
+    });
+  
     // Delete button event listeners
     tbody.querySelectorAll(".delete-btn").forEach((button) => {
       button.addEventListener("click", async () => {
@@ -202,18 +207,18 @@ const utils = {
         }
       });
     });
-
+  
     // Edit button handling (modal setup)
     const modal = document.getElementById("editBoxModal");
     const closeBtn = modal?.querySelector(".close");
     const editForm = document.getElementById("editBoxForm");
     const editResult = document.getElementById("editBoxResult");
-
+  
     if (!modal || !closeBtn || !editForm || !editResult) {
       console.error("Модальное окно или его элементы не найдены");
       return;
     }
-
+  
     tbody.querySelectorAll(".edit-btn").forEach((button) => {
       button.addEventListener("click", async () => {
         const barcode = button.getAttribute("data-barcode");
@@ -224,7 +229,7 @@ const utils = {
           document.getElementById("editBoxName").value = box.name;
           document.getElementById("editBoxBarcode").value = box.barcode;
           modal.style.display = "block";
-
+  
           editForm.onsubmit = async (e) => {
             e.preventDefault();
             const name = document.getElementById("editBoxName").value;
@@ -247,13 +252,12 @@ const utils = {
         }
       });
     });
-
+  
     closeBtn.onclick = () => (modal.style.display = "none");
     window.onclick = (event) => {
       if (event.target === modal) modal.style.display = "none";
     };
   },
-
   // Populate a <select> element with options
   populateSelect: (select, data, valueKey, displayKey) => {
     select.innerHTML = '<option value="">Выберите</option>';
@@ -519,34 +523,121 @@ const productsModule = {
 
 const scanModule = {
   init: () => {
+    // Элементы DOM
     const video = document.getElementById("video");
     const scannedBarcode = document.getElementById("scanned-barcode");
     const restartButton = document.getElementById("restart");
     const productInfo = document.getElementById("product-info");
     const errorDiv = document.getElementById("error");
+    const manualBarcodeForm = document.getElementById("manualBarcodeForm");
+    const manualBarcodeInput = document.getElementById("manualBarcode");
+    const overlay = document.getElementById("overlay");
+    const scanLog = document.getElementById("scan-log");
+
+    // Проверка наличия всех элементов
     if (
       !video ||
       !scannedBarcode ||
       !restartButton ||
       !productInfo ||
-      !errorDiv
-    )
+      !errorDiv ||
+      !manualBarcodeForm ||
+      !manualBarcodeInput ||
+      !overlay ||
+      !scanLog
+    ) {
+      console.error("Не найдены необходимые элементы DOM для scanModule");
       return;
+    }
 
-    function startScanner() {
+    // Функция остановки сканера
+    const stopScanner = () => {
+      if (globalState.stream) {
+        globalState.stream.getTracks().forEach(track => track.stop());
+        globalState.stream = null;
+      }
+      Quagga.stop();
+      overlay.classList.remove("active");
+    };
+
+    // Функция добавления записи в лог
+    const addToScanLog = (barcode) => {
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement("div");
+      logEntry.textContent = `[${timestamp}] Распознан: ${barcode}`;
+      scanLog.insertBefore(logEntry, scanLog.firstChild);
+      while (scanLog.children.length > 10) {
+        scanLog.removeChild(scanLog.lastChild);
+      }
+    };
+
+    // Функция обработки штрихкода
+    const processBarcode = async (barcode) => {
+      try {
+        scannedBarcode.textContent = `Штрихкод: ${barcode}`;
+        errorDiv.style.display = "none";
+        productInfo.style.display = "none";
+
+        if (!barcode.startsWith("200") && !barcode.startsWith("300")) {
+          return false; // Игнорируем неподходящие штрихкоды
+        }
+
+        if (barcode.startsWith("200")) {
+          const result = await utils.fetchData(`/product/${barcode}`);
+          const boxesInfo = result.boxes.length > 0
+            ? result.boxes.map(box => `<a href="/box-content.html?barcode=${box.barcode}">${box.name}</a>`).join(", ")
+            : "Не в коробке";
+          const photoPath = result.photo_paths && result.photo_paths.length > 0
+            ? result.photo_paths[0]
+            : "/images/placeholder.png";
+
+          // Карточка товара
+          productInfo.innerHTML = `
+            <div class="product-card">
+              <div class="product-card-header">
+                <h2>Найден товар</h2>
+              </div>
+              <div class="product-card-body">
+                <img src="${photoPath}" alt="${result.name}" class="product-image">
+                <div class="product-details">
+                  <p><strong>ID:</strong> ${result.id}</p>
+                  <p><strong>Название:</strong> <a href="/product.html?barcode=${result.barcode}">${result.name}</a></p>
+                  <p><strong>Количество:</strong> ${result.quantity}</p>
+                  <p><strong>Цена:</strong> ${result.price ? `${result.price} руб.` : "Не указано"}</p>
+                  <p><strong>Категория:</strong> ${result.category || "Не указано"}</p>
+                  <p><strong>Описание:</strong> ${result.description || "Нет описания"}</p>
+                  <p><strong>Штрихкод:</strong> <a href="/barcode/${result.barcode}" target="_blank">${result.barcode}</a></p>
+                  <p><strong>Коробки:</strong> ${boxesInfo}</p>
+                </div>
+              </div>
+            </div>
+          `;
+          productInfo.style.display = "block";
+          return true; // Успешно найден товар
+        } else if (barcode.startsWith("300")) {
+          window.location.href = `/box-content.html?barcode=${barcode}`;
+          return true; // Перенаправление на коробку
+        }
+        return false;
+      } catch (error) {
+        utils.showMessage(errorDiv, error.message || "Ошибка обработки штрихкода", "error");
+        return false; // Ошибка, продолжаем сканирование
+      }
+    };
+
+    // Запуск сканера
+    const startScanner = () => {
       errorDiv.style.display = "none";
       restartButton.style.display = "none";
       productInfo.style.display = "none";
       scannedBarcode.textContent = "";
+      scanLog.innerHTML = "";
+      overlay.classList.remove("active");
       globalState.lastDetected = null;
       globalState.detectionCount = 0;
 
       if (!navigator.mediaDevices?.getUserMedia) {
-        utils.showMessage(
-          errorDiv,
-          "Ваш браузер не поддерживает камеру",
-          "error"
-        );
+        utils.showMessage(errorDiv, "Ваш браузер не поддерживает камеру", "error");
         restartButton.style.display = "block";
         return;
       }
@@ -557,64 +648,106 @@ const scanModule = {
           globalState.stream = stream;
           video.srcObject = stream;
           video.play();
+
           Quagga.init(
             {
-              inputStream: { type: "LiveStream", target: video },
-              decoder: { readers: ["ean_reader"] },
+              inputStream: {
+                type: "LiveStream",
+                target: video,
+                constraints: {
+                  width: 640,
+                  height: 480,
+                  facingMode: "environment",
+                },
+              },
+              locator: {
+                patchSize: "large",
+                halfSample: false,
+              },
+              numOfWorkers: navigator.hardwareConcurrency || 4,
+              decoder: {
+                readers: ["ean_reader"],
+              },
+              locate: true,
+              frequency: 10,
             },
             (err) => {
-              if (err)
-                return utils.showMessage(
-                  errorDiv,
-                  `Ошибка Quagga: ${err}`,
-                  "error"
-                );
+              if (err) {
+                stopScanner();
+                utils.showMessage(errorDiv, `Ошибка инициализации Quagga: ${err}`, "error");
+                restartButton.style.display = "block";
+                return;
+              }
               Quagga.start();
             }
           );
+
           Quagga.onDetected(async (data) => {
             const barcode = data.codeResult.code;
+
+            // Добавляем каждый штрихкод в лог
+            addToScanLog(barcode);
+
+            // Показываем рамку только для "200" или "300"
+            if (barcode.startsWith("200") || barcode.startsWith("300")) {
+              overlay.classList.add("active");
+            } else {
+              overlay.classList.remove("active");
+              return; // Продолжаем сканирование для неподходящих штрихкодов
+            }
+
             scannedBarcode.textContent = `Штрихкод: ${barcode}`;
-            if (globalState.lastDetected === barcode)
+
+            // Подсчитываем детекции
+            if (globalState.lastDetected === barcode) {
               globalState.detectionCount++;
-            else {
+            } else {
               globalState.lastDetected = barcode;
               globalState.detectionCount = 1;
             }
-            if (globalState.detectionCount >= 3) {
-              Quagga.stop();
-              globalState.stream.getTracks().forEach((track) => track.stop());
-              try {
-                const result = await utils.fetchData(`/product/${barcode}`);
-                productInfo.innerHTML = `
-                  <h2>Найден товар</h2>
-                  <p><strong>ID:</strong> ${result.id}</p>
-                  <p><strong>Название:</strong> ${result.name}</p>
-                  <p><strong>Количество:</strong> ${result.quantity}</p>
-                  <p><strong>Цена:</strong> ${result.price ? `${result.price} руб.` : "Не указано"}</p>
-                  <p><strong>Категория:</strong> ${result.category || "Не указано"}</p>
-                  <p><strong>Описание:</strong> ${result.description || "Нет описания"}</p>
-                  <p><strong>Штрихкод:</strong> <a href="/barcode/${result.barcode}" target="_blank">${result.barcode}</a></p>
-                `;
-                productInfo.style.display = "block";
-              } catch (error) {
-                if (barcode.startsWith("300")) {
-                  window.location.href = `/box-content.html?barcode=${barcode}`;
-                } else {
-                  utils.showMessage(errorDiv, error.message, "error");
-                }
+
+            if (globalState.detectionCount >= 2) {
+              const success = await processBarcode(barcode);
+              if (success) {
+                stopScanner(); // Останавливаем при успехе после 2 детекций
+                restartButton.style.display = "block";
               }
-              restartButton.style.display = "block";
+              // Если success === false, продолжаем сканирование
             }
           });
         })
-        .catch((err) =>
-          utils.showMessage(errorDiv, `Ошибка камеры: ${err}`, "error")
-        );
-    }
+        .catch((err) => {
+          utils.showMessage(errorDiv, `Ошибка доступа к камере: ${err}`, "error");
+          restartButton.style.display = "block";
+        });
+    };
 
-    startScanner();
+    // Обработка ручного ввода
+    manualBarcodeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const barcode = manualBarcodeInput.value.trim();
+
+      if (barcode.length !== 13 || isNaN(barcode)) {
+        utils.showMessage(errorDiv, "Введите корректный 13-значный штрихкод", "error");
+        return;
+      }
+
+      stopScanner();
+      addToScanLog(barcode);
+      const success = await processBarcode(barcode);
+      restartButton.style.display = "block";
+      if (success) {
+        manualBarcodeInput.value = "";
+      } else {
+        startScanner();
+      }
+    });
+
+    // Перезапуск сканера
     restartButton.addEventListener("click", startScanner);
+
+    // Инициализация
+    startScanner();
   },
 };
 
@@ -650,7 +783,7 @@ const boxesModule = {
         boxes.forEach((box) => {
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td>${box.barcode}</td>
+            <td><a href="#" class="clickable-barcode" data-barcode="${box.barcode}">${box.barcode}</a></td>
             <td>${box.name}</td>
             <td>
               <button class="view-content-btn" data-barcode="${box.barcode}">
@@ -659,9 +792,41 @@ const boxesModule = {
               <button class="delete-btn" data-barcode="${box.barcode}">
                 <i class="fas fa-trash"></i>
               </button>
+              <a href="/barcode/${box.barcode}" download="barcode_${box.barcode}.png" class="download-btn">
+                <i class="fas fa-download"></i>
+              </a>
             </td>
           `;
           boxesListBody.appendChild(row);
+        });
+    
+        // Добавляем обработчик для кликабельных штрихкодов
+        boxesListBody.querySelectorAll(".clickable-barcode").forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const barcode = link.getAttribute("data-barcode");
+            utils.downloadPNG(`/barcode/${barcode}`, `barcode_${barcode}.png`);
+          });
+        });
+    
+        // Обработчики кнопок удаления остаются без изменений
+        boxesListBody.querySelectorAll(".delete-btn").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const barcode = button.getAttribute("data-barcode");
+            if (confirm(`Вы уверены, что хотите удалить коробку с артикулом ${barcode}?`)) {
+              try {
+                const message = await utils.fetchData(`/delete-box/${barcode}?force=true`, {
+                  method: "DELETE",
+                });
+                utils.showMessage(boxErrorDiv, message, "success");
+                boxesModule.loadBoxes();
+                boxContentContainer.style.display = "none";
+                addToBoxContainer.style.display = "none";
+              } catch (error) {
+                utils.showMessage(boxErrorDiv, error.message, "error");
+              }
+            }
+          });
         });
       } catch (error) {
         utils.showMessage(boxErrorDiv, error.message, "error");

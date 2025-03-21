@@ -543,7 +543,7 @@ app.get("/box-content/:barcode", async (req, res) => {
           name: box.name,
         }));
         return {
-          ...row,
+          ...row, 
           photo_paths: photoPaths,
           boxes,
         };
@@ -557,6 +557,6 @@ app.get("/box-content/:barcode", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+app.listen(port, '192.168.171.228',() => {
   console.log(`Сервер запущен на порту ${port}`);
 });

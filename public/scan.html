@@ -6,10 +6,6 @@
     <title>Сканировать штрихкод</title>
     <link rel="stylesheet" href="/css/styles.css" />
     <script src="/js/scripts.js" defer></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"
-      defer
-    ></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -17,44 +13,34 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
   </head>
   <body>
     <header class="main-header">
       <nav>
         <ul>
-          <li>
-            <a href="/index.html"><i class="fas fa-plus"></i> Добавить товар</a>
-          </li>
-          <li>
-            <a href="/products.html"
-              ><i class="fas fa-list"></i> Список товаров</a
-            >
-          </li>
-          <li>
-            <a href="/scan.html"
-              ><i class="fas fa-camera"></i> Сканировать штрихкод</a
-            >
-          </li>
-          <li>
-            <a href="/boxes.html"
-              ><i class="fas fa-box-open"></i> Управление коробками</a
-            >
-          </li>
+          <li><a href="/index.html"><i class="fas fa-plus"></i> Добавить товар</a></li>
+          <li><a href="/products.html"><i class="fas fa-list"></i> Список товаров</a></li>
+          <li><a href="/scan.html"><i class="fas fa-camera"></i> Сканировать штрихкод</a></li>
+          <li><a href="/boxes.html"><i class="fas fa-box-open"></i> Управление коробками</a></li>
         </ul>
       </nav>
     </header>
     <div class="main-content">
       <h1>Сканировать штрихкод</h1>
       <div id="video-container">
-        <video id="video" autoplay playsinline muted></video>
+        <video id="video" autoplay muted playsinline></video>
         <div id="overlay"></div>
       </div>
       <div id="scanned-barcode"></div>
-      <button id="restart" style="display: none">
-        <i class="fas fa-sync"></i> Сканировать снова
-      </button>
+      <div id="scan-log"></div>
+      <form id="manualBarcodeForm">
+        <input type="text" id="manualBarcode" name="manualBarcode" maxlength="13" placeholder="200... или 300..." />
+        <button type="submit"><i class="fas fa-check"></i></button>
+      </form>
       <div id="product-info"></div>
-      <div id="error" style="display: none"></div>
+      <button id="restart"><i class="fas fa-redo"></i> Перезапустить</button>
+      <div id="error"></div>
     </div>
     <footer>
       <p>© 2025 Управление складом</p>
