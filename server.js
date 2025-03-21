@@ -557,6 +557,6 @@ app.get("/box-content/:barcode", async (req, res) => {
   }
 });
 
-app.listen(port, '192.168.171.228',() => {
+app.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);
 });
