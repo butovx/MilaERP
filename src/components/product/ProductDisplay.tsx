@@ -262,100 +262,60 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                 ))}
               </div>
             )}
-          </div>
 
-          {/* Information block */}
-          <div className="md:w-[70%] p-8 border-t md:border-t-0 md:border-l border-[var(--card-border)] bg-[var(--background)]/10 flex flex-col justify-between">
-            <div>
-              {/* Category Tag */}
-              {product.category && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 mb-3 border border-indigo-500/20">
-                  {product.category}
-                </span>
-              )}
+            {/* Description (Moved here to utilize left column space) */}
+            {product.description && (
+              <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30">
+                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Описание</h3>
+                <p className="text-sm text-[var(--text-color-secondary)] leading-relaxed bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]/20">
+                  {product.description}
+                </p>
+              </div>
+            )}
 
-              <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-color-primary)] tracking-tight mb-4 leading-tight">
-                {product.name}
-              </h1>
-
-              {/* Price & Stock status info */}
-              <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-white/50 dark:bg-black/25 border border-[var(--card-border)]/50 rounded-xl">
-                <div>
-                  <span className="block text-[10px] uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-0.5">Цена</span>
-                  <span className="text-2xl font-black text-indigo-600 dark:text-indigo-450">
-                    {product.price ? `${product.price} ₽` : "—"}
-                  </span>
-                </div>
-                <div className="w-[1px] h-8 bg-[var(--card-border)]/45 hidden sm:block"></div>
-                <div>
-                  <span className="block text-[10px] uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-0.5">Статус склада</span>
-                  <span className={cn(
-                    "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border",
-                    product.quantity && product.quantity > 15
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/20"
-                      : product.quantity && product.quantity > 0
-                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-450 border-amber-500/20"
-                      : "bg-red-500/10 text-red-600 dark:text-red-450 border-red-500/20"
-                  )}>
-                    {product.quantity ? `${product.quantity} шт. в наличии` : "Нет на складе"}
-                  </span>
+            {/* Boxes section (Moved here to utilize left column space) */}
+            {product.boxes && product.boxes.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30">
+                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Находится в коробках</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.boxes.map((box, index) => (
+                    <Link
+                      key={index}
+                      href={`/box-content?barcode=${box.barcode}`}
+                      className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/10 transition-all duration-150"
+                    >
+                      📦 {box.name}
+                    </Link>
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Description */}
-              {product.description && (
-                <div className="mb-6">
-                  <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Описание</h3>
-                  <p className="text-sm text-[var(--text-color-secondary)] leading-relaxed bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]/20">
-                    {product.description}
-                  </p>
+            {/* Key Specs (Moved here to utilize left column space) */}
+            <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30 space-y-3">
+              <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-1">Спецификации</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)]/30 rounded-xl">
+                  <span className="block text-[10px] text-[var(--text-color-muted)] mb-0.5">Артикул / ID</span>
+                  <span className="text-sm font-mono font-semibold text-[var(--text-color-primary)]">{product.id}</span>
                 </div>
-              )}
-
-              {/* Key Specs */}
-              <div className="mb-6 space-y-3">
-                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-1">Спецификации</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)]/30 rounded-xl">
-                    <span className="block text-[10px] text-[var(--text-color-muted)] mb-0.5">Артикул / ID</span>
-                    <span className="text-sm font-mono font-semibold text-[var(--text-color-primary)]">{product.id}</span>
-                  </div>
-                  <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)]/30 rounded-xl">
-                    <span className="block text-[10px] text-[var(--text-color-muted)] mb-0.5">Штрихкод (EAN-13)</span>
-                    <span className="text-sm font-mono font-semibold text-[var(--text-color-primary)]">{product.barcode}</span>
-                  </div>
+                <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)]/30 rounded-xl">
+                  <span className="block text-[10px] text-[var(--text-color-muted)] mb-0.5">Штрихкод (EAN-13)</span>
+                  <span className="text-sm font-mono font-semibold text-[var(--text-color-primary)]">{product.barcode}</span>
                 </div>
               </div>
-
-              {/* Boxes section */}
-              {product.boxes && product.boxes.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Находится в коробках</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {product.boxes.map((box, index) => (
-                      <Link
-                        key={index}
-                        href={`/box-content?barcode=${box.barcode}`}
-                        className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/10 transition-all duration-150"
-                      >
-                        📦 {box.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Barcode & Download Section */}
-            <div className="mt-6 pt-6 border-t border-[var(--card-border)]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="bg-white p-3 border border-[var(--card-border)] rounded-xl shadow-sm inline-block">
+            {/* Barcode & Download Section (Moved here to utilize left column space) */}
+            <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30 flex flex-col items-center justify-center gap-4">
+              <div className="bg-white p-3 border border-[var(--card-border)] rounded-xl shadow-sm inline-block w-full text-center">
                 <Barcode
                   value={product.barcode}
                   height={60}
                   width={1.5}
                   fontSize={14}
                   margin={8}
-                  className="max-w-full"
+                  className="max-w-full mx-auto"
                   textMargin={4}
                   id={`barcode-${product.barcode}`}
                 />
@@ -363,11 +323,49 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
               <Button
                 onClick={downloadBarcode}
                 size="default"
-                className="w-full sm:w-auto shadow-md"
+                className="w-full shadow-md"
               >
                 <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
                 Скачать штрихкод
               </Button>
+            </div>
+          </div>
+
+          {/* Information block */}
+          <div className="md:w-[70%] p-8 border-t md:border-t-0 md:border-l border-[var(--card-border)] bg-[var(--background)]/10 flex flex-col gap-6">
+            {/* Category Tag */}
+            {product.category && (
+              <span className="self-start inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                {product.category}
+              </span>
+            )}
+
+            <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-color-primary)] tracking-tight leading-tight">
+              {product.name}
+            </h1>
+
+            {/* Price & Stock status info */}
+            <div className="flex flex-wrap items-center gap-4 p-4 bg-white/50 dark:bg-black/25 border border-[var(--card-border)]/50 rounded-xl">
+              <div>
+                <span className="block text-[10px] uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-0.5">Цена</span>
+                <span className="text-2xl font-black text-indigo-600 dark:text-indigo-450">
+                  {product.price ? `${product.price} ₽` : "—"}
+                </span>
+              </div>
+              <div className="w-[1px] h-8 bg-[var(--card-border)]/45 hidden sm:block"></div>
+              <div>
+                <span className="block text-[10px] uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-0.5">Статус склада</span>
+                <span className={cn(
+                  "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border",
+                  product.quantity && product.quantity > 15
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/20"
+                    : product.quantity && product.quantity > 0
+                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-450 border-amber-500/20"
+                    : "bg-red-500/10 text-red-600 dark:text-red-450 border-red-500/20"
+                )}>
+                  {product.quantity ? `${product.quantity} шт. в наличии` : "Нет на складе"}
+                </span>
+              </div>
             </div>
           </div>
         </div>
