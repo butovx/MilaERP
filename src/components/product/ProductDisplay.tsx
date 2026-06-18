@@ -263,16 +263,6 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
               </div>
             )}
 
-            {/* Description (Moved here to utilize left column space) */}
-            {product.description && (
-              <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30">
-                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Описание</h3>
-                <p className="text-sm text-[var(--text-color-secondary)] leading-relaxed bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]/20">
-                  {product.description}
-                </p>
-              </div>
-            )}
-
             {/* Boxes section (Moved here to utilize left column space) */}
             {product.boxes && product.boxes.length > 0 && (
               <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30">
@@ -367,6 +357,16 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                 </span>
               </div>
             </div>
+
+            {/* Description */}
+            {product.description && (
+              <div>
+                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Описание</h3>
+                <p className="text-sm text-[var(--text-color-secondary)] leading-relaxed bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]/20">
+                  {product.description}
+                </p>
+              </div>
+            )}
           </div>
         </div>
         </CardContent>
