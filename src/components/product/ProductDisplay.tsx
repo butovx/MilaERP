@@ -205,15 +205,15 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
         <CardContent className="p-0">
         <div className="md:flex">
           {/* Photos block */}
-          <div className="md:w-1/2 p-6 flex flex-col justify-center bg-transparent">
-            <div className="relative h-96 w-full bg-transparent overflow-hidden flex items-center justify-center">
+          <div className="md:w-1/2 p-4 flex flex-col justify-center bg-transparent">
+            <div className="relative h-80 w-full bg-transparent overflow-hidden flex items-center justify-center">
               {product.photo_paths && product.photo_paths.length > 0 ? (
                 <>
                   <ProductImage
                     src={product.photo_paths[currentPhotoIndex]}
                     alt={product.name}
                     fill
-                    className="object-contain p-2 transition-all duration-300 rounded-2xl"
+                    className="object-contain transition-all duration-300 rounded-2xl"
                   />
                   {product.photo_paths.length > 1 && (
                     <>
