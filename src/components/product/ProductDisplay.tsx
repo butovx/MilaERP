@@ -205,27 +205,27 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
         <CardContent className="p-0">
         <div className="md:flex">
           {/* Photos block */}
-          <div className="md:w-1/2 p-6 flex flex-col justify-center bg-slate-50/50 dark:bg-slate-950/20">
-            <div className="relative h-80 w-full bg-white dark:bg-slate-900 border border-[var(--card-border)]/60 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center">
+          <div className="md:w-1/2 p-6 flex flex-col justify-center bg-transparent">
+            <div className="relative h-96 w-full bg-transparent overflow-hidden flex items-center justify-center">
               {product.photo_paths && product.photo_paths.length > 0 ? (
                 <>
                   <ProductImage
                     src={product.photo_paths[currentPhotoIndex]}
                     alt={product.name}
                     fill
-                    className="object-contain p-4 transition-all duration-300"
+                    className="object-contain p-2 transition-all duration-300 rounded-2xl"
                   />
                   {product.photo_paths.length > 1 && (
                     <>
                       <button
                         onClick={prevPhoto}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-black/60 hover:bg-white dark:hover:bg-black border border-[var(--card-border)]/50 rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 border border-[var(--card-border)]/50 rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer z-10"
                       >
                         <ArrowLeftIcon className="h-5 w-5 text-[var(--text-color-primary)]" />
                       </button>
                       <button
                         onClick={nextPhoto}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-black/60 hover:bg-white dark:hover:bg-black border border-[var(--card-border)]/50 rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 border border-[var(--card-border)]/50 rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer z-10"
                       >
                         <ArrowRightIcon className="h-5 w-5 text-[var(--text-color-primary)]" />
                       </button>
@@ -233,7 +233,7 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                   )}
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 font-mono text-sm">
+                <div className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-650 font-mono text-sm">
                   <span>НЕТ ФОТОГРАФИЙ</span>
                 </div>
               )}
@@ -246,7 +246,7 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                   <button
                     key={index}
                     onClick={() => setCurrentPhotoIndex(index)}
-                    className={`h-16 w-16 relative flex-shrink-0 rounded-xl overflow-hidden border transition-all duration-200 ${
+                    className={`h-16 w-16 relative flex-shrink-0 rounded-xl overflow-hidden border transition-all duration-200 bg-transparent ${
                       index === currentPhotoIndex 
                         ? "border-indigo-500 ring-2 ring-indigo-500/25" 
                         : "border-[var(--card-border)] hover:border-indigo-500/50"
@@ -256,7 +256,7 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                       src={photo}
                       alt={`Миниатюра ${index + 1}`}
                       fill
-                      className="object-cover p-1"
+                      className="object-contain p-1"
                     />
                   </button>
                 ))}
