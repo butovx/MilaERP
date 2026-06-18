@@ -590,7 +590,7 @@ export default function BoxesPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+              <div className="mt-4 flex items-center justify-between border-t border-[var(--card-border)]/50 px-4 py-3 sm:px-6">
                 <div className="flex flex-1 justify-between sm:hidden">
                   <Button
                     variant="outline"
