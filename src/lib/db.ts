@@ -1,6 +1,5 @@
 import { Pool } from "pg";
 
-// Проверка наличия переменных окружения для подключения к БД
 if (
   !process.env.DB_USER ||
   !process.env.DB_HOST ||
