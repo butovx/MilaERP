@@ -9,7 +9,12 @@ import {
   ArrowTopRightOnSquareIcon,
   CheckIcon,
   MagnifyingGlassIcon,
+  Squares2X2Icon,
+  ListBulletIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
+import ProductCard from "@/components/product/ProductCard";
+import { cn } from "@/utils/cn";
 import { H1, H2, Text, ErrorText } from "@/components/Typography";
 import ProductImage from "@/components/ProductImage";
 import DataTable from "@/components/DataTable";
@@ -23,6 +28,8 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [deletingSingleId, setDeletingSingleId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
 
@@ -122,6 +129,43 @@ export default function ProductsPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteProductSingle = async (id: number, name: string) => {
+    if (!confirm(`Вы действительно хотите удалить товар "${name}"?\nЭто действие нельзя отменить.`)) {
+      return;
+    }
+    setDeletingSingleId(id);
+    try {
+      const response = await fetch(`/api/products/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        toast.success({
+          id: genId(),
+          title: "Успешно",
+          description: `Товар "${name}" удален`,
+        });
+        fetchProducts();
+        fetchCategories();
+      } else {
+        const data = await response.json();
+        toast.error({
+          id: genId(),
+          title: "Ошибка",
+          description: data.error || "Произошла ошибка при удалении товара",
+        });
+      }
+    } catch (error) {
+      console.error("Ошибка при удалении товара:", error);
+      toast.error({
+        id: genId(),
+        title: "Ошибка",
+        description: "Произошла ошибка при удалении товара",
+      });
+    } finally {
+      setDeletingSingleId(null);
     }
   };
 
@@ -427,6 +471,37 @@ export default function ProductsPage() {
         ),
       mobilePriority: 3,
     },
+    {
+      key: "actions",
+      header: "Действия",
+      render: (product: Product) => (
+        <div className="flex gap-1.5 justify-end">
+          <Link
+            href={`/product/${product.id}/edit`}
+            className="p-1 rounded text-gray-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Редактировать"
+          >
+            <PencilIcon className="h-4 w-4" />
+          </Link>
+          <button
+            onClick={() => downloadBarcode(product.barcode)}
+            className="p-1 rounded text-gray-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Скачать штрихкод"
+          >
+            <ArrowDownTrayIcon className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => deleteProductSingle(product.id, product.name)}
+            disabled={deletingSingleId === product.id}
+            className="p-1 rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors cursor-pointer disabled:opacity-50"
+            title="Удалить"
+          >
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        </div>
+      ),
+      mobilePriority: 2,
+    },
   ];
 
   // Barcode download function
@@ -598,8 +673,8 @@ export default function ProductsPage() {
           </select>
         </div>
 
-        {/* Sorting */}
-        <div className="flex gap-2">
+        {/* Sorting & View Mode Toggle */}
+        <div className="flex gap-2 items-center">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
@@ -619,6 +694,34 @@ export default function ProductsPage() {
             <option value="asc">↑</option>
             <option value="desc">↓</option>
           </select>
+          
+          {/* View Mode Toggle Buttons */}
+          <div className="flex bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md p-1 h-[40px] items-center">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={cn(
+                "p-1.5 rounded transition-colors cursor-pointer",
+                viewMode === "grid" 
+                  ? "bg-indigo-500/10 text-indigo-505" 
+                  : "text-[var(--text-color-muted)] hover:text-[var(--text-color-primary)]"
+              )}
+              title="Сетка"
+            >
+              <Squares2X2Icon className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("table")}
+              className={cn(
+                "p-1.5 rounded transition-colors cursor-pointer",
+                viewMode === "table" 
+                  ? "bg-indigo-500/10 text-indigo-505" 
+                  : "text-[var(--text-color-muted)] hover:text-[var(--text-color-primary)]"
+              )}
+              title="Таблица"
+            >
+              <ListBulletIcon className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -729,15 +832,32 @@ export default function ProductsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <DataTable
-              columns={columns}
-              data={products}
-              emptyMessage={
-                debouncedSearch.trim() || categoryFilter
-                  ? "По вашему запросу ничего не найдено"
-                  : "Список товаров пуст"
-              }
-            />
+            {viewMode === "table" ? (
+              <DataTable
+                columns={columns}
+                data={products}
+                emptyMessage={
+                  debouncedSearch.trim() || categoryFilter
+                    ? "По вашему запросу ничего не найдено"
+                    : "Список товаров пуст"
+                }
+              />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    selectionMode={selectionMode}
+                    isSelected={selectedProducts.includes(product.id)}
+                    onToggleSelect={toggleProductSelection}
+                    onDownloadBarcode={downloadBarcode}
+                    onDelete={deleteProductSingle}
+                    isDeleting={deletingSingleId === product.id}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
