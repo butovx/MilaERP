@@ -205,8 +205,8 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
         <CardContent className="p-0">
         <div className="md:flex">
           {/* Photos block */}
-          <div className="md:w-[35%] p-4 flex flex-col justify-center bg-transparent">
-            <div className="relative h-80 w-full bg-transparent overflow-hidden flex items-center justify-center">
+          <div className="md:w-[30%] p-6 flex flex-col justify-start bg-transparent">
+            <div className="relative aspect-square w-full bg-transparent overflow-hidden flex items-center justify-center">
               {product.photo_paths && product.photo_paths.length > 0 ? (
                 <>
                   <ProductImage
@@ -265,7 +265,7 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
           </div>
 
           {/* Information block */}
-          <div className="md:w-[65%] p-8 border-t md:border-t-0 md:border-l border-[var(--card-border)] bg-[var(--background)]/10 flex flex-col justify-between">
+          <div className="md:w-[70%] p-8 border-t md:border-t-0 md:border-l border-[var(--card-border)] bg-[var(--background)]/10 flex flex-col justify-between">
             <div>
               {/* Category Tag */}
               {product.category && (
