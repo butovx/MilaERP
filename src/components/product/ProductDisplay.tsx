@@ -263,24 +263,6 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
               </div>
             )}
 
-            {/* Boxes section (Moved here to utilize left column space) */}
-            {product.boxes && product.boxes.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30">
-                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Находится в коробках</h3>
-                <div className="flex flex-wrap gap-2">
-                  {product.boxes.map((box, index) => (
-                    <Link
-                      key={index}
-                      href={`/box-content?barcode=${box.barcode}`}
-                      className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/10 transition-all duration-150"
-                    >
-                      📦 {box.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Key Specs (Moved here to utilize left column space) */}
             <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30 space-y-3">
               <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-1">Спецификации</h3>
@@ -365,6 +347,24 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                 <p className="text-sm text-[var(--text-color-secondary)] leading-relaxed bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]/20">
                   {product.description}
                 </p>
+              </div>
+            )}
+
+            {/* Boxes section */}
+            {product.boxes && product.boxes.length > 0 && (
+              <div>
+                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Находится в коробках</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.boxes.map((box, index) => (
+                    <Link
+                      key={index}
+                      href={`/box-content?barcode=${box.barcode}`}
+                      className="inline-flex items-center px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20 border border-indigo-500/10 transition-all duration-150"
+                    >
+                      📦 {box.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>
