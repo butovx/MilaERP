@@ -113,13 +113,13 @@ export default function ProductCard({
       )}
 
       {/* Product Image Wrapper */}
-      <div className="relative aspect-[4/3] w-full bg-slate-50 dark:bg-slate-950/40 overflow-hidden border-b border-[var(--card-border)]/50">
+      <div className="relative aspect-[4/3] w-full bg-transparent overflow-hidden p-3">
         {product.photo_paths && product.photo_paths.length > 0 ? (
           <ProductImage
             src={product.photo_paths[0]}
             alt={product.name}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-contain p-1 rounded-lg transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-slate-400 dark:text-slate-600 text-xs font-mono">
