@@ -185,7 +185,7 @@ export default function ProductCard({
         </div>
 
         {/* Price and Stock Row */}
-        <div className="flex items-center justify-between pt-3 border-t border-[var(--card-border)]/50 mt-auto">
+        <div className="flex items-center justify-between pt-3 border-t border-[var(--card-border)] mt-auto">
           <div className="text-base font-bold text-[var(--text-color-primary)]">
             {product.price ? `${product.price} ₽` : "—"}
           </div>

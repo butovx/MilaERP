@@ -386,7 +386,7 @@ export default function HomePage() {
 
         {/* Real-time Activities Log */}
         <Card className="flex flex-col">
-          <CardHeader className="pb-3 border-b border-[var(--card-border)]/50">
+          <CardHeader className="pb-3 border-b border-[var(--card-border)]">
             <CardTitle className="text-base font-bold">Журнал последних событий</CardTitle>
             <CardDescription>Сводная активность на складе в реальном времени</CardDescription>
           </CardHeader>

@@ -524,7 +524,7 @@ export default function BoxesPage() {
 
       {/* Box List */}
       <Card className="mb-6">
-        <CardHeader className="pb-3 border-b border-[var(--card-border)]/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <CardHeader className="pb-3 border-b border-[var(--card-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <CardTitle className="text-base font-semibold">Список коробок</CardTitle>
           </div>
@@ -672,7 +672,7 @@ export default function BoxesPage() {
 
       {/* Box Creation Form */}
       <Card>
-        <CardHeader className="pb-3 border-b border-[var(--card-border)]/50">
+        <CardHeader className="pb-3 border-b border-[var(--card-border)]">
           <CardTitle className="text-base font-semibold">Создать коробку</CardTitle>
         </CardHeader>
         <CardContent className="pt-6">

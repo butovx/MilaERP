@@ -219,13 +219,13 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                     <>
                       <button
                         onClick={prevPhoto}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 border border-[var(--card-border)]/50 rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer z-10"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 border border-[var(--card-border)] rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer z-10"
                       >
                         <ArrowLeftIcon className="h-5 w-5 text-[var(--text-color-primary)]" />
                       </button>
                       <button
                         onClick={nextPhoto}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 border border-[var(--card-border)]/50 rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer z-10"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 border border-[var(--card-border)] rounded-full p-2 hover:shadow transition-all duration-200 cursor-pointer z-10"
                       >
                         <ArrowRightIcon className="h-5 w-5 text-[var(--text-color-primary)]" />
                       </button>
@@ -264,14 +264,14 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
             )}
 
             {/* Key Specs (Moved here to utilize left column space) */}
-            <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30 space-y-3">
+            <div className="mt-6 pt-6 border-t border-[var(--card-border)] space-y-3">
               <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-1">Спецификации</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)]/30 rounded-xl">
+                <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)] rounded-xl">
                   <span className="block text-[10px] text-[var(--text-color-muted)] mb-0.5">Артикул / ID</span>
                   <span className="text-sm font-mono font-semibold text-[var(--text-color-primary)]">{product.id}</span>
                 </div>
-                <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)]/30 rounded-xl">
+                <div className="p-3 bg-[var(--background)]/35 border border-[var(--card-border)] rounded-xl">
                   <span className="block text-[10px] text-[var(--text-color-muted)] mb-0.5">Штрихкод (EAN-13)</span>
                   <span className="text-sm font-mono font-semibold text-[var(--text-color-primary)]">{product.barcode}</span>
                 </div>
@@ -279,7 +279,7 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
             </div>
 
             {/* Barcode & Download Section (Moved here to utilize left column space) */}
-            <div className="mt-6 pt-6 border-t border-[var(--card-border)]/30 flex flex-col items-center justify-center gap-4">
+            <div className="mt-6 pt-6 border-t border-[var(--card-border)] flex flex-col items-center justify-center gap-4">
               <div className="bg-white p-3 border border-[var(--card-border)] rounded-xl shadow-sm inline-block w-full text-center">
                 <Barcode
                   value={product.barcode}
@@ -317,14 +317,14 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
             </h1>
 
             {/* Price & Stock status info */}
-            <div className="flex flex-wrap items-center gap-4 p-4 bg-white/50 dark:bg-black/25 border border-[var(--card-border)]/50 rounded-xl">
+            <div className="flex flex-wrap items-center gap-4 p-4 bg-white/50 dark:bg-black/25 border border-[var(--card-border)] rounded-xl">
               <div>
                 <span className="block text-[10px] uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-0.5">Цена</span>
                 <span className="text-2xl font-black text-indigo-600 dark:text-indigo-450">
                   {product.price ? `${product.price} ₽` : "—"}
                 </span>
               </div>
-              <div className="w-[1px] h-8 bg-[var(--card-border)]/45 hidden sm:block"></div>
+              <div className="w-[1px] h-8 bg-[var(--card-border)] hidden sm:block"></div>
               <div>
                 <span className="block text-[10px] uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-0.5">Статус склада</span>
                 <span className={cn(
@@ -344,7 +344,7 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
             {product.description && (
               <div>
                 <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Описание</h3>
-                <p className="text-sm text-[var(--text-color-secondary)] leading-relaxed bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]/20">
+                <p className="text-sm text-[var(--text-color-secondary)] leading-relaxed bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]">
                   {product.description}
                 </p>
               </div>

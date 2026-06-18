@@ -861,7 +861,7 @@ export default function ProductsPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-4 flex items-center justify-between border-t border-[var(--card-border)]/50 pt-4 px-2">
+              <div className="mt-4 flex items-center justify-between border-t border-[var(--card-border)] pt-4 px-2">
                 <div className="flex flex-1 justify-between sm:hidden">
                   <Button
                     variant="outline"
@@ -895,7 +895,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="relative inline-flex items-center rounded-l-md px-3 py-1.5 text-[var(--text-color-muted)] ring-1 ring-inset ring-[var(--card-border)]/60 hover:bg-[var(--background)]/50 focus:z-20 focus:outline-offset-0 disabled:opacity-30 disabled:cursor-not-allowed text-xs transition-colors cursor-pointer"
+                        className="relative inline-flex items-center rounded-l-md px-3 py-1.5 text-[var(--text-color-muted)] ring-1 ring-inset ring-[var(--card-border)] hover:bg-[var(--background)]/50 focus:z-20 focus:outline-offset-0 disabled:opacity-30 disabled:cursor-not-allowed text-xs transition-colors cursor-pointer"
                       >
                         Назад
                       </button>
@@ -904,7 +904,7 @@ export default function ProductsPage() {
                           return (
                             <span
                               key={`ellipsis-${idx}`}
-                              className="relative inline-flex items-center px-3 py-1.5 text-xs font-semibold text-[var(--text-color-secondary)] ring-1 ring-inset ring-[var(--card-border)]/60 focus:outline-none"
+                              className="relative inline-flex items-center px-3 py-1.5 text-xs font-semibold text-[var(--text-color-secondary)] ring-1 ring-inset ring-[var(--card-border)] focus:outline-none"
                             >
                               {p}
                             </span>
@@ -919,7 +919,7 @@ export default function ProductsPage() {
                             className={`relative inline-flex items-center px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
                               isCurrent
                                 ? "z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                : "text-[var(--text-color-primary)] ring-1 ring-inset ring-[var(--card-border)]/60 hover:bg-[var(--background)]/50 focus:z-20 focus:outline-offset-0"
+                                : "text-[var(--text-color-primary)] ring-1 ring-inset ring-[var(--card-border)] hover:bg-[var(--background)]/50 focus:z-20 focus:outline-offset-0"
                             }`}
                           >
                             {p}
@@ -929,7 +929,7 @@ export default function ProductsPage() {
                       <button
                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                         disabled={page === totalPages}
-                        className="relative inline-flex items-center rounded-r-md px-3 py-1.5 text-[var(--text-color-muted)] ring-1 ring-inset ring-[var(--card-border)]/60 hover:bg-[var(--background)]/50 focus:z-20 focus:outline-offset-0 disabled:opacity-30 disabled:cursor-not-allowed text-xs transition-colors cursor-pointer"
+                        className="relative inline-flex items-center rounded-r-md px-3 py-1.5 text-[var(--text-color-muted)] ring-1 ring-inset ring-[var(--card-border)] hover:bg-[var(--background)]/50 focus:z-20 focus:outline-offset-0 disabled:opacity-30 disabled:cursor-not-allowed text-xs transition-colors cursor-pointer"
                       >
                         Вперед
                       </button>

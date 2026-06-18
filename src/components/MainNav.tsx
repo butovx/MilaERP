@@ -85,7 +85,7 @@ export default function MainNav() {
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-[var(--card-border)]/60">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-[var(--card-border)]">
           <Link href="/" className="flex items-center overflow-hidden min-w-0">
             <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20">
               <CubeIcon className="h-5 w-5 text-white" />
@@ -111,7 +111,7 @@ export default function MainNav() {
 
         {/* Expand Button (when collapsed) */}
         {isCollapsed && (
-          <div className="flex justify-center py-2 border-b border-[var(--card-border)]/40">
+          <div className="flex justify-center py-2 border-b border-[var(--card-border)]">
             <button
               onClick={toggleCollapse}
               className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-color-muted)] hover:text-[var(--text-color-primary)] transition-colors"
@@ -157,7 +157,7 @@ export default function MainNav() {
         </nav>
 
         {/* Additional Links and Theme Settings */}
-        <div className="p-2 border-t border-[var(--card-border)]/60 space-y-1">
+        <div className="p-2 border-t border-[var(--card-border)] space-y-1">
           {/* Help Section */}
           {helpItems.map((item) => {
             const isActive = pathname === item.href;
@@ -268,7 +268,7 @@ export default function MainNav() {
           }`}
         >
           {/* Drawer Header */}
-          <div className="h-14 flex items-center justify-between px-4 border-b border-[var(--card-border)]/60">
+          <div className="h-14 flex items-center justify-between px-4 border-b border-[var(--card-border)]">
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
                 <CubeIcon className="h-5 w-5 text-white" />
@@ -308,7 +308,7 @@ export default function MainNav() {
           </nav>
 
           {/* Drawer Footer */}
-          <div className="p-4 border-t border-[var(--card-border)]/60 space-y-3 bg-[var(--background)]/40">
+          <div className="p-4 border-t border-[var(--card-border)] space-y-3 bg-[var(--background)]/40">
             {helpItems.map((item) => (
               <Link
                 key={item.href}

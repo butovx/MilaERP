@@ -795,7 +795,7 @@ export default function ScanPage() {
         {/* --- SCANNING COLUMN (7/12) --- */}
         <div className="lg:col-span-7 space-y-6">
           <Card className="overflow-hidden">
-            <CardHeader className="pb-3 border-b border-[var(--card-border)]/50">
+            <CardHeader className="pb-3 border-b border-[var(--card-border)]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-semibold">HUD Камеры</CardTitle>
@@ -929,7 +929,7 @@ export default function ScanPage() {
               {/* PRODUCT IDENTIFIED */}
               {product && (
                 <Card>
-                  <CardHeader className="pb-3 border-b border-[var(--card-border)]/50">
+                  <CardHeader className="pb-3 border-b border-[var(--card-border)]">
                     <div className="flex justify-between items-center">
                       <CardTitle className="text-base font-semibold">Идентифицирован товар</CardTitle>
                       <span className="text-[10px] font-mono uppercase bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 px-2 py-0.5 rounded">
@@ -1006,7 +1006,7 @@ export default function ScanPage() {
               {/* BOX IDENTIFIED */}
               {box && (
                 <Card>
-                  <CardHeader className="pb-3 border-b border-[var(--card-border)]/50">
+                  <CardHeader className="pb-3 border-b border-[var(--card-border)]">
                     <div className="flex justify-between items-center">
                       <CardTitle className="text-base font-semibold">Идентифицирована коробка</CardTitle>
                       <span className="text-[10px] font-mono uppercase bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 px-2 py-0.5 rounded">
@@ -1056,7 +1056,7 @@ export default function ScanPage() {
                       </div>
 
                       {/* Box Contents */}
-                      <div className="pt-4 border-t border-[var(--card-border)]/50">
+                      <div className="pt-4 border-t border-[var(--card-border)]">
                         <h3 className="text-sm font-semibold mb-3">Содержимое коробки ({boxItems.length} поз.)</h3>
                         {loadingBoxItems ? (
                           <div className="flex items-center justify-center py-6 text-xs text-indigo-500">
@@ -1135,7 +1135,7 @@ export default function ScanPage() {
         <div className="lg:col-span-5 space-y-6">
           {/* Barcode Input */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[var(--card-border)]/50">
+            <CardHeader className="pb-3 border-b border-[var(--card-border)]">
               <CardTitle className="text-base font-semibold">Поиск по коду</CardTitle>
               <CardDescription>Введите 13-значный код EAN-13 вручную</CardDescription>
             </CardHeader>
@@ -1162,7 +1162,7 @@ export default function ScanPage() {
 
           {/* Session Log / Scan History */}
           <Card>
-            <CardHeader className="pb-2 border-b border-[var(--card-border)]/50">
+            <CardHeader className="pb-2 border-b border-[var(--card-border)]">
               <CardTitle className="text-base font-semibold">Журнал сессии</CardTitle>
               <CardDescription>Лог операций текущего устройства</CardDescription>
             </CardHeader>
