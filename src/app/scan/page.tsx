@@ -36,6 +36,7 @@ export default function ScanPage() {
   const [loadingBoxItems, setLoadingBoxItems] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraZoom, setCameraZoom] = useState(1.0);
+  const [scannerReady, setScannerReady] = useState(false);
 
   // New states for camera and scan history
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
@@ -269,7 +270,7 @@ export default function ScanPage() {
         videoRef.current.removeEventListener("touchstart", handleTouch);
       }
     };
-  }, [isScanning, cameraZoom]);
+  }, [isScanning, cameraZoom, scannerReady]);
 
   // Function for manual camera focus
   const handleManualFocus = async () => {
@@ -327,6 +328,7 @@ export default function ScanPage() {
 
     // Reset state
     setIsScanning(true);
+    setScannerReady(false);
     setBarcode(null);
     setProduct(null);
     setBox(null);
@@ -402,6 +404,14 @@ export default function ScanPage() {
             }
 
             window.Quagga.initialized = true;
+            
+            // Get the video element created by Quagga and assign it to videoRef.current
+            const quaggaVideo = document.querySelector("#scanner-container video") as HTMLVideoElement;
+            if (quaggaVideo) {
+              (videoRef as any).current = quaggaVideo;
+            }
+            setScannerReady(true);
+            
             window.Quagga.start();
             loadCameras(); // Load available cameras (after permissions are granted)
 
@@ -813,9 +823,8 @@ export default function ScanPage() {
             <CardContent className="pt-6">
               {/* Scanner Container with Tech HUD Frame */}
               <div className="tech-hud-frame w-full max-w-lg mx-auto bg-black rounded-lg overflow-hidden border border-[var(--card-border)] aspect-[4/3] relative">
-                <div className="tech-hud-frame-inner w-full h-full">
-                  {/* Video Stream */}
-                  <video ref={videoRef} className="w-full h-full object-cover grayscale brightness-90 contrast-125" />
+                <div id="scanner-container" className="tech-hud-frame-inner w-full h-full relative">
+                  {/* Quagga dynamically injects video and canvas here */}
                   
                   {/* Target Sight Overlay */}
                   <div className="absolute inset-0 z-10 flex items-center justify-center p-8 bg-black/10">
