@@ -9,14 +9,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[var(--button-primary-bg)] text-[var(--button-primary-text)] hover:bg-[var(--button-primary-hover)] shadow-sm hover:shadow-md hover:shadow-indigo-500/10",
+          "bg-[var(--button-primary-bg)] text-[var(--button-primary-text)] hover:bg-[var(--button-primary-hover)] hover:text-[var(--button-primary-text)] shadow-sm hover:shadow-md hover:shadow-indigo-500/10",
         destructive:
-          "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 shadow-sm",
+          "bg-red-600 text-white hover:bg-red-700 hover:text-white dark:bg-red-500 dark:hover:bg-red-600 dark:hover:text-white shadow-sm",
         outline:
-          "border border-[var(--card-border)] bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-color-primary)] shadow-sm",
+          "border border-[var(--card-border)] bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-color-primary)] hover:text-[var(--text-color-primary)] shadow-sm",
         secondary:
-          "bg-black/5 dark:bg-white/5 text-[var(--text-color-primary)] hover:bg-black/10 dark:hover:bg-white/10 shadow-sm",
-        ghost: "hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-color-primary)]",
+          "bg-black/5 dark:bg-white/5 text-[var(--text-color-primary)] hover:bg-black/10 dark:hover:bg-white/10 hover:text-[var(--text-color-primary)] shadow-sm",
+        ghost: "hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-color-primary)] hover:text-[var(--text-color-primary)]",
         link: "text-indigo-500 dark:text-indigo-400 underline-offset-4 hover:underline",
       },
       size: {
