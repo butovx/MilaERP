@@ -31,6 +31,7 @@ const DELIVERY_METHODS_MAP: Record<string, { label: string; icon: string }> = {
   post: { label: "Почта России", icon: "📯" },
   yandex: { label: "Яндекс Маркет Доставка", icon: "🚗" },
   wb: { label: "WB доставка", icon: "📦" },
+  ozon: { label: "Ozon доставка", icon: "🔵" },
   cdek: { label: "СДЭК", icon: "⚡" },
   avito: { label: "Авито доставка", icon: "🚚" },
 };

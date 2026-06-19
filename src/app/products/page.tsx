@@ -762,6 +762,7 @@ export default function ProductsPage() {
             <option value="post">📯 Почта России</option>
             <option value="yandex">🚗 Яндекс Маркет Доставка</option>
             <option value="wb">📦 WB доставка</option>
+            <option value="ozon">🔵 Ozon доставка</option>
             <option value="cdek">⚡ СДЭК</option>
             <option value="avito">🚚 Авито доставка</option>
           </select>

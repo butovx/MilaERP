@@ -26,6 +26,7 @@ const DELIVERY_METHODS_OPTIONS = [
   { id: "post", label: "Почта России", icon: "📯" },
   { id: "yandex", label: "Яндекс Маркет Доставка", icon: "🚗" },
   { id: "wb", label: "WB доставка", icon: "📦" },
+  { id: "ozon", label: "Ozon доставка", icon: "🔵" },
   { id: "cdek", label: "СДЭК", icon: "⚡" },
   { id: "avito", label: "Авито доставка", icon: "🚚" },
 ];
@@ -64,9 +65,29 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [deliveryMethods, setDeliveryMethods] = useState<string[]>([]);
 
   const toggleSalesChannel = (channel: string) => {
-    setSalesChannels((prev) =>
-      prev.includes(channel) ? prev.filter((c) => c !== channel) : [...prev, channel]
-    );
+    setSalesChannels((prev) => {
+      const isCurrentlySelected = prev.includes(channel);
+      const next = isCurrentlySelected ? prev.filter((c) => c !== channel) : [...prev, channel];
+      
+      if (!isCurrentlySelected) {
+        if (channel === "ozon" && !deliveryMethods.includes("ozon")) {
+          setDeliveryMethods((d) => [...d, "ozon"]);
+        } else if (channel === "wildberries" && !deliveryMethods.includes("wb")) {
+          setDeliveryMethods((d) => [...d, "wb"]);
+        } else if (channel === "yandex_market" && !deliveryMethods.includes("yandex")) {
+          setDeliveryMethods((d) => [...d, "yandex"]);
+        }
+      } else {
+        if (channel === "ozon") {
+          setDeliveryMethods((d) => d.filter((m) => m !== "ozon"));
+        } else if (channel === "wildberries") {
+          setDeliveryMethods((d) => d.filter((m) => m !== "wb"));
+        } else if (channel === "yandex_market") {
+          setDeliveryMethods((d) => d.filter((m) => m !== "yandex"));
+        }
+      }
+      return next;
+    });
   };
 
   const toggleDeliveryMethod = (method: string) => {

@@ -57,7 +57,18 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const salesChannelsRaw = formData.get("sales_channels") as string;
     const salesChannels = salesChannelsRaw ? JSON.parse(salesChannelsRaw) : [];
     const deliveryMethodsRaw = formData.get("delivery_methods") as string;
-    const deliveryMethods = deliveryMethodsRaw ? JSON.parse(deliveryMethodsRaw) : [];
+    const deliveryMethods: string[] = deliveryMethodsRaw ? JSON.parse(deliveryMethodsRaw) : [];
+
+    // Auto-map sales channels to delivery methods
+    if (salesChannels.includes("ozon") && !deliveryMethods.includes("ozon")) {
+      deliveryMethods.push("ozon");
+    }
+    if (salesChannels.includes("wildberries") && !deliveryMethods.includes("wb")) {
+      deliveryMethods.push("wb");
+    }
+    if (salesChannels.includes("yandex_market") && !deliveryMethods.includes("yandex")) {
+      deliveryMethods.push("yandex");
+    }
 
     // Check if the product exists
     const checkResult = await pool.query(
