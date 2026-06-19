@@ -7,6 +7,8 @@ export interface Product {
   description?: string;
   price?: number;
   category?: string;
+  sales_channels?: string[];
+  delivery_methods?: string[];
   boxes?: Box[];
 }
 

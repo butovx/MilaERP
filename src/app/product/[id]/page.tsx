@@ -1,13 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
-import { Product } from "@/types";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ArrowDownTrayIcon,
-} from "@heroicons/react/24/outline";
-import ProductImage from "@/components/ProductImage";
-import React from "react";
 import ProductDisplay from "@/components/product/ProductDisplay";
 
 interface ProductPageProps {

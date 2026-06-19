@@ -6,6 +6,24 @@ import { H1, Label, ErrorText, SuccessText } from "@/components/Typography";
 import Barcode from "@/components/Barcode";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/utils/cn";
+
+const SALES_CHANNELS_OPTIONS = [
+  { id: "physical_store", label: "Физический магазин", icon: "🏬" },
+  { id: "avito", label: "Авито", icon: "💬" },
+  { id: "ozon", label: "Озон", icon: "🔵" },
+  { id: "wildberries", label: "Вайлдберис", icon: "🟣" },
+  { id: "yandex_market", label: "Яндекс Маркет", icon: "🟡" },
+  { id: "website", label: "Сайт-магазин", icon: "🌐" },
+];
+
+const DELIVERY_METHODS_OPTIONS = [
+  { id: "post", label: "Почта России", icon: "📯" },
+  { id: "yandex", label: "Яндекс Маркет Доставка", icon: "🚗" },
+  { id: "wb", label: "WB доставка", icon: "📦" },
+  { id: "cdek", label: "СДЭК", icon: "⚡" },
+  { id: "avito", label: "Авито доставка", icon: "🚚" },
+];
 
 export default function AddProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,6 +34,20 @@ export default function AddProductPage() {
     price: "",
     category: "",
   });
+  const [salesChannels, setSalesChannels] = useState<string[]>([]);
+  const [deliveryMethods, setDeliveryMethods] = useState<string[]>([]);
+
+  const toggleSalesChannel = (channel: string) => {
+    setSalesChannels((prev) =>
+      prev.includes(channel) ? prev.filter((c) => c !== channel) : [...prev, channel]
+    );
+  };
+
+  const toggleDeliveryMethod = (method: string) => {
+    setDeliveryMethods((prev) =>
+      prev.includes(method) ? prev.filter((m) => m !== method) : [...prev, method]
+    );
+  };
   const [files, setFiles] = useState<FileList | null>(null);
   const [result, setResult] = useState<{
     message?: string;
@@ -70,6 +102,8 @@ export default function AddProductPage() {
       Object.entries(formData).forEach(([key, value]) => {
         data.append(key, value);
       });
+      data.append("sales_channels", JSON.stringify(salesChannels));
+      data.append("delivery_methods", JSON.stringify(deliveryMethods));
 
       if (files) {
         Array.from(files).forEach((file) => {
@@ -100,6 +134,8 @@ export default function AddProductPage() {
           price: "",
           category: "",
         });
+        setSalesChannels([]);
+        setDeliveryMethods([]);
         setFiles(null);
 
         // Reset file input
@@ -201,6 +237,56 @@ export default function AddProductPage() {
               onChange={handleChange}
               className="mt-1.5 block w-full rounded-md bg-[var(--input-bg)] border border-[var(--input-border)] text-[var(--input-text)] text-xs sm:text-sm py-2 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
             />
+          </div>
+
+          <div>
+            <Label>Где продается (Каналы продаж):</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-1.5">
+              {SALES_CHANNELS_OPTIONS.map((option) => {
+                const isSelected = salesChannels.includes(option.id);
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => toggleSalesChannel(option.id)}
+                    className={cn(
+                      "flex items-center gap-2 p-3 text-xs sm:text-sm font-medium rounded-xl border transition-all duration-200 cursor-pointer text-left",
+                      isSelected
+                        ? "bg-indigo-500/10 border-indigo-500 text-indigo-650 dark:text-indigo-400 font-bold"
+                        : "bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--text-color-secondary)] hover:border-indigo-500/40 hover:bg-slate-50/50 dark:hover:bg-slate-900/50"
+                    )}
+                  >
+                    <span className="text-base">{option.icon}</span>
+                    <span>{option.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <Label>Способы доставки:</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-1.5">
+              {DELIVERY_METHODS_OPTIONS.map((option) => {
+                const isSelected = deliveryMethods.includes(option.id);
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => toggleDeliveryMethod(option.id)}
+                    className={cn(
+                      "flex items-center gap-2 p-3 text-xs sm:text-sm font-medium rounded-xl border transition-all duration-200 cursor-pointer text-left",
+                      isSelected
+                        ? "bg-indigo-500/10 border-indigo-500 text-indigo-650 dark:text-indigo-400 font-bold"
+                        : "bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--text-color-secondary)] hover:border-indigo-500/40 hover:bg-slate-50/50 dark:hover:bg-slate-900/50"
+                    )}
+                  >
+                    <span className="text-base">{option.icon}</span>
+                    <span>{option.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div>

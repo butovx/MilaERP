@@ -54,6 +54,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const description = (formData.get("description") as string) || null;
     const price = (formData.get("price") as string) || null;
     const category = (formData.get("category") as string) || null;
+    const salesChannelsRaw = formData.get("sales_channels") as string;
+    const salesChannels = salesChannelsRaw ? JSON.parse(salesChannelsRaw) : [];
+    const deliveryMethodsRaw = formData.get("delivery_methods") as string;
+    const deliveryMethods = deliveryMethodsRaw ? JSON.parse(deliveryMethodsRaw) : [];
 
     // Check if the product exists
     const checkResult = await pool.query(
@@ -92,8 +96,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
        photo_paths = $3, 
        description = $4, 
        price = $5, 
-       category = $6
-       WHERE id = $7`,
+       category = $6,
+       sales_channels = $7,
+       delivery_methods = $8
+       WHERE id = $9`,
       [
         name,
         quantity ? parseInt(quantity, 10) : null,
@@ -101,6 +107,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
         description,
         price ? parseFloat(price) : null,
         category,
+        salesChannels,
+        deliveryMethods,
         id,
       ]
     );

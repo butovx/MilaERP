@@ -18,6 +18,23 @@ import Barcode from "@/components/Barcode";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+const SALES_CHANNELS_MAP: Record<string, { label: string; icon: string }> = {
+  physical_store: { label: "Физический магазин", icon: "🏬" },
+  avito: { label: "Авито", icon: "💬" },
+  ozon: { label: "Озон", icon: "🔵" },
+  wildberries: { label: "Вайлдберис", icon: "🟣" },
+  yandex_market: { label: "Яндекс Маркет", icon: "🟡" },
+  website: { label: "Сайт-магазин", icon: "🌐" },
+};
+
+const DELIVERY_METHODS_MAP: Record<string, { label: string; icon: string }> = {
+  post: { label: "Почта России", icon: "📯" },
+  yandex: { label: "Яндекс Маркет Доставка", icon: "🚗" },
+  wb: { label: "WB доставка", icon: "📦" },
+  cdek: { label: "СДЭК", icon: "⚡" },
+  avito: { label: "Авито доставка", icon: "🚚" },
+};
+
 interface ProductDisplayProps {
   productId: string;
 }
@@ -337,6 +354,50 @@ export default function ProductDisplay({ productId }: ProductDisplayProps) {
                 )}>
                   {product.quantity ? `${product.quantity} шт. в наличии` : "Нет на складе"}
                 </span>
+              </div>
+            </div>
+
+            {/* Sales Channels & Delivery Methods */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[var(--background)]/30 p-4 rounded-xl border border-[var(--card-border)]">
+              <div>
+                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Где продается</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.sales_channels && product.sales_channels.length > 0 ? (
+                    product.sales_channels.map((channel) => {
+                      const opt = SALES_CHANNELS_MAP[channel] || { label: channel, icon: "📦" };
+                      return (
+                        <span key={channel} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-650 dark:text-indigo-405 border border-indigo-500/10">
+                          <span>{opt.icon}</span>
+                          <span>{opt.label}</span>
+                        </span>
+                      );
+                    })
+                  ) : (
+                    <span className="text-xs italic text-[var(--text-color-muted)]">Не указано</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs uppercase tracking-wider text-[var(--text-color-muted)] font-bold mb-2">Доставка</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.delivery_methods && product.delivery_methods.length > 0 ? (
+                    product.delivery_methods.map((method) => {
+                      const opt = DELIVERY_METHODS_MAP[method] || { label: method, icon: "🚚" };
+                      return (
+                        <span key={method} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-650 dark:text-emerald-405 border border-emerald-500/10">
+                          <span>{opt.icon}</span>
+                          <span>{opt.label}</span>
+                        </span>
+                      );
+                    })
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-red-500/10 text-red-650 dark:text-red-405 border border-red-500/10">
+                      <span>❌</span>
+                      <span>Не используется</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 

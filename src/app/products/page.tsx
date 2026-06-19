@@ -6,8 +6,6 @@ import { Product } from "@/types";
 import {
   PencilIcon,
   TrashIcon,
-  ArrowTopRightOnSquareIcon,
-  CheckIcon,
   MagnifyingGlassIcon,
   Squares2X2Icon,
   ListBulletIcon,
@@ -22,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import JsBarcode from "jsbarcode";
-import { useRouter } from "next/navigation";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -41,6 +38,9 @@ export default function ProductsPage() {
 
   // Filtering and sorting state
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [salesChannelFilter, setSalesChannelFilter] = useState("");
+  const [deliveryMethodFilter, setDeliveryMethodFilter] = useState("");
+  const [noDeliveryFilter, setNoDeliveryFilter] = useState(false);
   const [sortBy, setSortBy] = useState("id");
   const [sortOrder, setSortOrder] = useState("asc");
 
@@ -50,7 +50,6 @@ export default function ProductsPage() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
-  const [deletingProductsIds, setDeletingProductsIds] = useState<number[]>([]);
 
   // State for working with boxes
   const [boxes, setBoxes] = useState<
@@ -61,7 +60,7 @@ export default function ProductsPage() {
   const [isAddingToBox, setIsAddingToBox] = useState(false);
   const [quantityToAdd, setQuantityToAdd] = useState<number>(1);
 
-  const router = useRouter();
+
 
   useEffect(() => {
     fetchCategories();
@@ -77,7 +76,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchProducts();
-  }, [page, categoryFilter, sortBy, sortOrder, debouncedSearch]);
+  }, [page, categoryFilter, salesChannelFilter, deliveryMethodFilter, noDeliveryFilter, sortBy, sortOrder, debouncedSearch]);
 
   useEffect(() => {
     if (selectionMode && selectedProducts.length > 0) {
@@ -108,6 +107,9 @@ export default function ProductsPage() {
         limit: String(limit),
         search: debouncedSearch,
         category: categoryFilter,
+        sales_channel: salesChannelFilter,
+        delivery_method: deliveryMethodFilter,
+        no_delivery: String(noDeliveryFilter),
         sort: sortBy,
         order: sortOrder,
       });
@@ -225,7 +227,7 @@ export default function ProductsPage() {
       return;
     }
 
-    setDeletingProductsIds([...selectedProducts]);
+
 
     try {
       const results = await Promise.all(
@@ -259,8 +261,6 @@ export default function ProductsPage() {
         title: "Ошибка",
         description: "Произошла ошибка при удалении товаров",
       });
-    } finally {
-      setDeletingProductsIds([]);
     }
   };
 
@@ -722,6 +722,70 @@ export default function ProductsPage() {
               <ListBulletIcon className="h-4 w-4" />
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Advanced Filters: Sales Channel & Delivery */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        {/* Filter by Sales Channel */}
+        <div>
+          <select
+            value={salesChannelFilter}
+            onChange={(e) => {
+              setSalesChannelFilter(e.target.value);
+              setPage(1);
+            }}
+            className="w-full px-3 py-2 rounded-md bg-[var(--input-bg)] border border-[var(--input-border)] text-[var(--input-text)] text-xs h-[40px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+          >
+            <option value="">Все каналы продаж</option>
+            <option value="physical_store">🏬 Физический магазин</option>
+            <option value="avito">💬 Авито</option>
+            <option value="ozon">🔵 Озон</option>
+            <option value="wildberries">🟣 Вайлдберис</option>
+            <option value="yandex_market">🟡 Яндекс Маркет</option>
+            <option value="website">🌐 Сайт-магазин</option>
+          </select>
+        </div>
+
+        {/* Filter by Delivery Method */}
+        <div>
+          <select
+            value={deliveryMethodFilter}
+            disabled={noDeliveryFilter}
+            onChange={(e) => {
+              setDeliveryMethodFilter(e.target.value);
+              setPage(1);
+            }}
+            className="w-full px-3 py-2 rounded-md bg-[var(--input-bg)] border border-[var(--input-border)] text-[var(--input-text)] text-xs h-[40px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 disabled:opacity-50"
+          >
+            <option value="">Все способы доставки</option>
+            <option value="post">📯 Почта России</option>
+            <option value="yandex">🚗 Яндекс Маркет Доставка</option>
+            <option value="wb">📦 WB доставка</option>
+            <option value="cdek">⚡ СДЭК</option>
+            <option value="avito">🚚 Авито доставка</option>
+          </select>
+        </div>
+
+        {/* Filter by No Delivery Checkbox */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-[var(--input-bg)] border border-[var(--input-border)] h-[40px] text-xs">
+          <input
+            type="checkbox"
+            id="noDeliveryFilter"
+            checked={noDeliveryFilter}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setNoDeliveryFilter(checked);
+              if (checked) {
+                setDeliveryMethodFilter(""); // Clear delivery method filter if checking "no delivery"
+              }
+              setPage(1);
+            }}
+            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+          />
+          <label htmlFor="noDeliveryFilter" className="text-[var(--text-color-secondary)] font-medium cursor-pointer select-none">
+            ❌ Без доставки (не используется)
+          </label>
         </div>
       </div>
 

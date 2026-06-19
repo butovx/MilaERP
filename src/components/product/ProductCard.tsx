@@ -7,7 +7,6 @@ import {
   PencilIcon,
   TrashIcon,
   ArrowDownTrayIcon,
-  ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
 
@@ -155,6 +154,56 @@ export default function ProductCard({
             {product.name}
           </div>
         </div>
+
+        {/* Sales Channels & Delivery Methods Badges */}
+        {((product.sales_channels && product.sales_channels.length > 0) || (product.delivery_methods && product.delivery_methods.length > 0)) ? (
+          <div className="mb-2 flex flex-wrap gap-1 items-center relative z-20" onClick={(e) => e.stopPropagation()}>
+            {product.sales_channels?.slice(0, 4).map((channel) => {
+              const icons: Record<string, string> = {
+                physical_store: "🏬",
+                avito: "💬",
+                ozon: "🔵",
+                wildberries: "🟣",
+                yandex_market: "🟡",
+                website: "🌐",
+              };
+              const names: Record<string, string> = {
+                physical_store: "Физический магазин",
+                avito: "Авито",
+                ozon: "Озон",
+                wildberries: "Вайлдберис",
+                yandex_market: "Яндекс Маркет",
+                website: "Сайт-магазин",
+              };
+              return (
+                <span key={channel} title={names[channel] || channel} className="text-sm filter drop-shadow-sm select-none">
+                  {icons[channel] || "📦"}
+                </span>
+              );
+            })}
+            
+            {product.sales_channels && product.sales_channels.length > 4 && (
+              <span className="text-[9px] font-bold text-[var(--text-color-muted)] select-none">
+                +{product.sales_channels.length - 4}
+              </span>
+            )}
+
+            {/* Divider if both exist */}
+            {product.sales_channels && product.sales_channels.length > 0 && product.delivery_methods && product.delivery_methods.length > 0 && (
+              <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-1"></span>
+            )}
+
+            {product.delivery_methods && product.delivery_methods.length > 0 ? (
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/10 font-semibold flex items-center gap-0.5 select-none" title={`Доставка: ${product.delivery_methods.length} способ(а)`}>
+                🚚 <span className="font-mono text-[8px]">{product.delivery_methods.length}</span>
+              </span>
+            ) : (
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-650 dark:text-red-405 border border-red-500/10 font-semibold select-none" title="Без доставки">
+                ❌ Доставка
+              </span>
+            )}
+          </div>
+        ) : null}
 
         {/* Boxes relation */}
         <div className="mb-4 flex-1">

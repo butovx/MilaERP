@@ -16,6 +16,8 @@ CREATE TABLE products (
     description TEXT,
     price DECIMAL(10, 2),
     category VARCHAR(100),
+    sales_channels TEXT[] DEFAULT '{}'::text[] NOT NULL,
+    delivery_methods TEXT[] DEFAULT '{}'::text[] NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

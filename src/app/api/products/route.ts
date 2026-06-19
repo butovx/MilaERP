@@ -12,6 +12,10 @@ export async function POST(request: NextRequest) {
     const description = (formData.get("description") as string) || null;
     const price = (formData.get("price") as string) || null;
     const category = (formData.get("category") as string) || null;
+    const salesChannelsRaw = formData.get("sales_channels") as string;
+    const salesChannels = salesChannelsRaw ? JSON.parse(salesChannelsRaw) : [];
+    const deliveryMethodsRaw = formData.get("delivery_methods") as string;
+    const deliveryMethods = deliveryMethodsRaw ? JSON.parse(deliveryMethodsRaw) : [];
 
     // File processing
     const files: File[] = [];
@@ -41,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Add product to the database
     await pool.query(
-      "INSERT INTO products (name, quantity, barcode, photo_paths, description, price, category) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      "INSERT INTO products (name, quantity, barcode, photo_paths, description, price, category, sales_channels, delivery_methods) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
       [
         name,
         quantity ? parseInt(quantity, 10) : null,
@@ -50,6 +54,8 @@ export async function POST(request: NextRequest) {
         description,
         price ? parseFloat(price) : null,
         category,
+        salesChannels,
+        deliveryMethods,
       ]
     );
 
@@ -77,6 +83,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const category = searchParams.get("category") || "";
+    const salesChannel = searchParams.get("sales_channel") || "";
+    const deliveryMethod = searchParams.get("delivery_method") || "";
+    const noDelivery = searchParams.get("no_delivery") || "";
     const sort = searchParams.get("sort") || "";
     const order = searchParams.get("order") || "";
     const page = searchParams.get("page") || "";
@@ -122,6 +131,22 @@ export async function GET(request: NextRequest) {
       queryValues.push(category.trim());
       const pIdx = queryValues.length;
       whereClauses.push(`category = $${pIdx}`);
+    }
+
+    if (salesChannel.trim()) {
+      queryValues.push(salesChannel.trim());
+      const pIdx = queryValues.length;
+      whereClauses.push(`$${pIdx} = ANY(sales_channels)`);
+    }
+
+    if (deliveryMethod.trim()) {
+      queryValues.push(deliveryMethod.trim());
+      const pIdx = queryValues.length;
+      whereClauses.push(`$${pIdx} = ANY(delivery_methods)`);
+    }
+
+    if (noDelivery === "true") {
+      whereClauses.push(`cardinality(delivery_methods) = 0`);
     }
 
     const whereStr = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
