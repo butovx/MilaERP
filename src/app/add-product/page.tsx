@@ -39,35 +39,35 @@ export default function AddProductPage() {
   const [deliveryMethods, setDeliveryMethods] = useState<string[]>([]);
 
   const toggleSalesChannel = (channel: string) => {
-    setSalesChannels((prev) => {
-      const isCurrentlySelected = prev.includes(channel);
-      const next = isCurrentlySelected ? prev.filter((c) => c !== channel) : [...prev, channel];
-      
-      if (!isCurrentlySelected) {
-        if (channel === "ozon" && !deliveryMethods.includes("ozon")) {
-          setDeliveryMethods((d) => [...d, "ozon"]);
-        } else if (channel === "wildberries" && !deliveryMethods.includes("wb")) {
-          setDeliveryMethods((d) => [...d, "wb"]);
-        } else if (channel === "yandex_market" && !deliveryMethods.includes("yandex")) {
-          setDeliveryMethods((d) => [...d, "yandex"]);
-        }
-      } else {
-        if (channel === "ozon") {
-          setDeliveryMethods((d) => d.filter((m) => m !== "ozon"));
-        } else if (channel === "wildberries") {
-          setDeliveryMethods((d) => d.filter((m) => m !== "wb"));
-        } else if (channel === "yandex_market") {
-          setDeliveryMethods((d) => d.filter((m) => m !== "yandex"));
-        }
+    const isCurrentlySelected = salesChannels.includes(channel);
+    setSalesChannels((prev) =>
+      isCurrentlySelected ? prev.filter((c) => c !== channel) : [...prev, channel]
+    );
+
+    if (!isCurrentlySelected) {
+      if (channel === "ozon") {
+        setDeliveryMethods((d) => d.includes("ozon") ? d : [...d, "ozon"]);
+      } else if (channel === "wildberries") {
+        setDeliveryMethods((d) => d.includes("wb") ? d : [...d, "wb"]);
+      } else if (channel === "yandex_market") {
+        setDeliveryMethods((d) => d.includes("yandex") ? d : [...d, "yandex"]);
       }
-      return next;
-    });
+    } else {
+      if (channel === "ozon") {
+        setDeliveryMethods((d) => d.filter((m) => m !== "ozon"));
+      } else if (channel === "wildberries") {
+        setDeliveryMethods((d) => d.filter((m) => m !== "wb"));
+      } else if (channel === "yandex_market") {
+        setDeliveryMethods((d) => d.filter((m) => m !== "yandex"));
+      }
+    }
   };
 
   const toggleDeliveryMethod = (method: string) => {
-    setDeliveryMethods((prev) =>
-      prev.includes(method) ? prev.filter((m) => m !== method) : [...prev, method]
-    );
+    setDeliveryMethods((prev) => {
+      const next = prev.includes(method) ? prev.filter((m) => m !== method) : [...prev, method];
+      return Array.from(new Set(next));
+    });
   };
   const [files, setFiles] = useState<FileList | null>(null);
   const [result, setResult] = useState<{

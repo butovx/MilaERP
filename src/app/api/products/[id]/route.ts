@@ -55,20 +55,24 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const price = (formData.get("price") as string) || null;
     const category = (formData.get("category") as string) || null;
     const salesChannelsRaw = formData.get("sales_channels") as string;
-    const salesChannels = salesChannelsRaw ? JSON.parse(salesChannelsRaw) : [];
+    const salesChannels: string[] = Array.from(
+      new Set(salesChannelsRaw ? JSON.parse(salesChannelsRaw) : [])
+    );
     const deliveryMethodsRaw = formData.get("delivery_methods") as string;
-    const deliveryMethods: string[] = deliveryMethodsRaw ? JSON.parse(deliveryMethodsRaw) : [];
+    const rawDeliveryMethods: string[] = deliveryMethodsRaw ? JSON.parse(deliveryMethodsRaw) : [];
 
     // Auto-map sales channels to delivery methods
-    if (salesChannels.includes("ozon") && !deliveryMethods.includes("ozon")) {
-      deliveryMethods.push("ozon");
+    const deliveryMethodsSet = new Set(rawDeliveryMethods);
+    if (salesChannels.includes("ozon")) {
+      deliveryMethodsSet.add("ozon");
     }
-    if (salesChannels.includes("wildberries") && !deliveryMethods.includes("wb")) {
-      deliveryMethods.push("wb");
+    if (salesChannels.includes("wildberries")) {
+      deliveryMethodsSet.add("wb");
     }
-    if (salesChannels.includes("yandex_market") && !deliveryMethods.includes("yandex")) {
-      deliveryMethods.push("yandex");
+    if (salesChannels.includes("yandex_market")) {
+      deliveryMethodsSet.add("yandex");
     }
+    const deliveryMethods = Array.from(deliveryMethodsSet);
 
     // Check if the product exists
     const checkResult = await pool.query(
