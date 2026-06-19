@@ -423,6 +423,44 @@ export default function ProductsPage() {
       mobilePriority: 3,
     },
     {
+      key: "sales_channels",
+      header: "Каналы",
+      render: (product: Product) => {
+        const icons: Record<string, string> = {
+          physical_store: "🏬",
+          avito: "💬",
+          ozon: "🔵",
+          wildberries: "🟣",
+          yandex_market: "🟡",
+          website: "🌐",
+        };
+        const names: Record<string, string> = {
+          physical_store: "Физический магазин",
+          avito: "Авито",
+          ozon: "Озон",
+          wildberries: "Вайлдберис",
+          yandex_market: "Яндекс Маркет",
+          website: "Сайт-магазин",
+        };
+        return product.sales_channels && product.sales_channels.length > 0 ? (
+          <div className="flex flex-wrap gap-1 max-w-[120px]">
+            {product.sales_channels.map((channel) => (
+              <span
+                key={channel}
+                title={names[channel] || channel}
+                className="text-base filter drop-shadow-sm select-none"
+              >
+                {icons[channel] || "📦"}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <div className="w-[60px] text-center">-</div>
+        );
+      },
+      mobilePriority: 3,
+    },
+    {
       key: "barcode",
       header: "Штрихкод",
       render: (product: Product) => (
